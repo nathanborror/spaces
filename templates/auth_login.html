@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" "Sign in"}}
+  {{template "header"}}
+</head>
+
+<body>
+
+<article class="ui-auth">
+  <form action="/login" method="post">
+    <fieldset>
+      <input type="text" name="email" value="" placeholder="Your email address" class="ux-focus">
+      <input type="password" name="password" value="" placeholder="Your password">
+      <button type="submit">Sign in</button>
+    </fieldset>
+  </form>
+</article>
+
+<footer>
+  <a href="/register">Register for a new account</a>
+</footer>
+
+</body>
+</html>

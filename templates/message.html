@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" "Message"}}
+  {{template "header"}}
+</head>
+
+<body class="page-room">
+
+<header>
+  <h1>{{.room.Name}}</h1>
+</header>
+
+<article>
+
+  <div class="ui-list">
+    {{template "renderMessage" .message}}
+  </div>
+
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" "Skit"}}
+  {{template "header"}}
+</head>
+
+<body>
+
+<header>
+  <h1>{{if .item}}{{.item.Text}}{{else}}{{.user.Name}}{{end}}</h1>
+</header>
+
+<article>
+
+  <div class="ui-list">
+    {{range .rooms}}
+      {{template "renderRoom" .}}
+    {{end}}
+  </div>
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>

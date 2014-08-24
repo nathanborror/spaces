@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" "Skit"}}
+  {{template "header"}}
+</head>
+
+<body>
+
+<header>
+  <h1>Create room</h1>
+</header>
+
+<article>
+  <form action="/r/save" method="post">
+    <p><input type="text" name="name" value="" placeholder="Name"></p>
+    <p><input type="text" name="users" value="" placeholder="People"></p>
+    <button type="submit">Create</button>
+  </form>
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>

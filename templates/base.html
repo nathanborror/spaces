@@ -1,0 +1,62 @@
+{{define "title"}}
+  <title>{{.}}</title>
+{{end}}
+
+{{define "header"}}
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" href="/static/stylesheets/screen.css">
+
+  <script type="text/javascript" src="/static/javascript/vendor/underscore.js"></script>
+  <script type="text/javascript" src="/static/javascript/vendor/jquery.js"></script>
+  <script type="text/javascript" src="/static/javascript/vendor/jquery-ui.js"></script>
+  <script type="text/javascript" src="/static/javascript/socket.js"></script>
+  <script type="text/javascript" src="/static/javascript/main.js"></script>
+{{end}}
+
+{{define "login"}}
+  {{if .request}}
+    {{if .request|isAuthenticated}}{{else}}
+    <a class="ui-button ui-button-login" href="/login">Sign in</a>
+    {{end}}
+  {{end}}
+{{end}}
+
+{{define "footer"}}
+  <footer>
+    <a href="/" class="ui-home">Home</a>
+    · <a href="/r/create">Create room</a>
+    {{if .request}}
+      {{if .request|isAuthenticated}}{{else}}
+      · <a class="ui-login" href="/login">Sign in</a>
+      {{end}}
+
+      {{if .request|isAuthenticated}}
+      · <a class="ui-logout" href="/logout">Sign out</a>
+      {{end}}
+    {{end}}
+  </footer>
+
+  <div class="ui-preload">
+    <img src="/static/images/StickerWolf@2x.png" width="1" alt="" />
+    <img src="/static/images/StickerOwl@2x.png" width="1" alt="" />
+    <img src="/static/images/StickerBear@2x.png" width="1" alt="" />
+    <img src="/static/images/StickerOtter@2x.png" width="1" alt="" />
+    <img src="/static/images/StickerSeal@2x.png" width="1" alt="" />
+  </div>
+{{end}}
+
+{{define "alert"}}
+  <div id="alert"></div>
+{{end}}
+
+{{define "renderRoom"}}
+  <div class="ui-row">
+    <h4><a href="/r/{{.Hash}}">{{.Name}}</a></h4>
+  </div>
+{{end}}
+
+{{define "renderMessage"}}
+  <div class="ui-message" id="{{.Hash}}" data-hash="{{.Hash}}" data-parent="{{.Parent}}" data-user="{{.User}}" data-text="{{.Text}}">
+    <p><span class="ui-message-user">{{with $user := .User|user}}{{$user.Name}}{{end}}</span>: {{.Text}}</p>
+  </div>
+{{end}}

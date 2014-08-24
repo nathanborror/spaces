@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" "Room"}}
+  {{template "header"}}
+</head>
+
+<body class="page-room">
+
+<header>
+  <h1>{{.room.Name}}</h1>
+  <a class="ui-back" href="/">Back</a>
+</header>
+
+<article>
+
+  <div class="ui-list">
+  </div>
+
+  <form action="/m/save" method="post" class="ui-room-form" autocomplete="off">
+    <p><input type="text" name="text" value="" placeholder="Say something..." class="ux-focus" autocomplete="off"></p>
+    <input type="hidden" name="parent" value="{{.room.Hash}}">
+    <button type="submit" class="hidden">Post</button>
+  </form>
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>
