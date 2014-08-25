@@ -158,7 +158,7 @@ func main() {
 	http.Handle("/", r)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	err := http.ListenAndServe(":8080", nil)
+	err := http.ListenAndServe(":8082", nil)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
