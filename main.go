@@ -114,7 +114,7 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 	message, err := messageRepo.Load(hash)
 	check(err, w)
 
-	room, err := roomRepo.Load(message.Parent)
+	room, err := roomRepo.Load(message.Room)
 	check(err, w)
 
 	user, err := authRepo.Load(message.User)
