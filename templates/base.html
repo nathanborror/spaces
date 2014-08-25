@@ -33,6 +33,7 @@
       {{if .request|isAuthenticated}}
       · <a class="ui-logout" href="/logout">Sign out</a>
       {{end}}
+      · <a href="/dropbox">Dropbox</a>
     {{end}}
   </footer>
 
@@ -58,5 +59,17 @@
 {{define "renderMessage"}}
   <div class="ui-message" id="{{.Hash}}" data-hash="{{.Hash}}" data-room="{{.Room}}" data-user="{{.User}}" data-text="{{.Text}}">
     <p><span class="ui-message-user">{{with $user := .User|user}}{{$user.Name}}{{end}}</span>: {{.Text}}</p>
+  </div>
+{{end}}
+
+{{define "renderFile"}}
+  <div class="ui-row">
+    <h4>
+      <a href="https://www.dropbox.com/work{{.Path}}">
+        <span class="ui-icon ui-icon-{{.Icon}}"></span>
+        <span class="ui-title">{{.Path}}</span>
+        <span class="ui-subtitle">Modifed yesterday</span>
+      </a>
+    </h4>
   </div>
 {{end}}

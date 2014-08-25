@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  {{template "title" "Room"}}
+  {{template "title" .room.Name}}
   {{template "header"}}
 </head>
 
@@ -10,6 +10,7 @@
 <header>
   <h1>{{.room.Name}}</h1>
   <a class="ui-back" href="/">Back</a>
+  <a class="ui-folder" href="/r/{{.room.Hash}}/folder">Folder</a>
 </header>
 
 <article>

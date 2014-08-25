@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +15,9 @@ import (
 	"github.com/nathanborror/gommon/markdown"
 	"github.com/nathanborror/gommon/render"
 )
+
+const appKey = "14l6emnb3m4jxye"
+const appSecret = "8gdnanccsg7ty7f"
 
 var cookieStore = sessions.NewCookieStore([]byte("something-very-very-secret"))
 var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
@@ -73,6 +77,34 @@ func roomFormHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	room, err := roomRepo.Load(hash)
+	check(err, w)
+
+	session, _ := cookieStore.Get(r, "dropbox")
+	token := fmt.Sprintf("%v", session.Values["token"])
+	if token == "<nil>" { // HACK
+		http.Redirect(w, r, "/dropbox", 302)
+	}
+
+	response, err := Request("https://api.dropbox.com/1/metadata/auto/DMX", token)
+	if err != nil {
+		panic(err)
+	}
+
+	var folder Entry
+	DecodeResponse(response, &folder)
+
+	render.Render(w, r, "room_folder", map[string]interface{}{
+		"request": r,
+		"room":    room,
+		"folder":  folder,
+	})
+}
+
 // Message Handlers
 
 func messageHandler(w http.ResponseWriter, r *http.Request) {
@@ -110,10 +142,15 @@ func main() {
 	r.HandleFunc("/r/create", auth.LoginRequired(roomFormHandler))
 	r.HandleFunc("/r/save", auth.LoginRequired(rooms.SaveHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}", roomHandler)
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/folder", roomFolderHandler)
 
 	// Message
 	r.HandleFunc("/m/save", auth.LoginRequired(messages.SaveHandler))
 	r.HandleFunc("/m/{hash:[a-zA-Z0-9-]+}", messageHandler)
+
+	// Dropbox
+	http.HandleFunc("/dropbox", handleDropboxAuth)
+	http.HandleFunc("/callback", handleDropboxCallback)
 
 	r.HandleFunc("/ws", hubspoke.SpokeHandler)
 	r.HandleFunc("/", auth.LoginRequired(roomsHandler))
