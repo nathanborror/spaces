@@ -43,6 +43,18 @@ MessageManager.submit = function(e) {
 
 var Message = {};
 
+Message.renderSticker = function(text) {
+  var re = /:(\w+):/g;
+  var match = re.exec(text);
+
+  if (match) {
+    var cleaned = match[1];
+    var title = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    return 'Sticker'+title+'@2x.png'
+  }
+  return;
+};
+
 // HTML returns HTML necessary to render an message.
 Message.html = function(message) {
   var text = message.text;
@@ -51,10 +63,9 @@ Message.html = function(message) {
     text = text.slice(0,-1);
   }
 
-  switch (text) {
-    case ":wolf:":
-      text = '<img class="ui-message-sticker" src="/static/images/StickerWolf@2x.png">';
-      break;
+  var sticker = Message.renderSticker(text);
+  if (sticker) {
+    text = '<img class="ui-message-sticker" src="/static/images/'+sticker+'">';
   }
 
   var html = $(''+
