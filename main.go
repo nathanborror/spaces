@@ -15,7 +15,7 @@ import (
 	"github.com/nathanborror/gommon/render"
 )
 
-var store = sessions.NewCookieStore([]byte("something-very-very-secret"))
+var cookieStore = sessions.NewCookieStore([]byte("something-very-very-secret"))
 var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
 var messageRepo = messages.MessageSQLRepository("db.sqlite3")
 var authRepo = auth.AuthSQLRepository("db.sqlite3")
@@ -23,7 +23,7 @@ var authRepo = auth.AuthSQLRepository("db.sqlite3")
 func init() {
 	_ = render.RegisterTemplateFunction("markdown", markdown.Markdown)
 
-	store.Options = &sessions.Options{
+	cookieStore.Options = &sessions.Options{
 		Domain:   "localhost",
 		Path:     "/",
 		MaxAge:   3600 * 8, // 8 hours
