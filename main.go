@@ -8,8 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/nathanborror/chat/messages"
-	"github.com/nathanborror/chat/rooms"
+	"github.com/nathanborror/spaces/messages"
+	"github.com/nathanborror/spaces/rooms"
 	"github.com/nathanborror/gommon/auth"
 	"github.com/nathanborror/gommon/hubspoke"
 	"github.com/nathanborror/gommon/markdown"

@@ -1,7 +1,7 @@
 #all:
-#	docker kill chat; docker rm chat
-#	docker build -t chat .
-#	docker run --name=chat -d -p 8080:8080 chati
+#	docker kill spaces; docker rm spaces
+#	docker build -t spaces .
+#	docker run --name=spaces -d -p 8080:8080 spaces
 #
 all:
-	go build && ./chat
+	go build && ./spaces

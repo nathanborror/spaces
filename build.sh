@@ -1,4 +1,4 @@
 #!/bin/bash
 
-killall chat
-go build && ./chat
+killall spaces
+go build && ./spaces
