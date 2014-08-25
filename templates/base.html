@@ -56,7 +56,7 @@
 {{end}}
 
 {{define "renderMessage"}}
-  <div class="ui-message" id="{{.Hash}}" data-hash="{{.Hash}}" data-parent="{{.Parent}}" data-user="{{.User}}" data-text="{{.Text}}">
+  <div class="ui-message" id="{{.Hash}}" data-hash="{{.Hash}}" data-room="{{.Room}}" data-user="{{.User}}" data-text="{{.Text}}">
     <p><span class="ui-message-user">{{with $user := .User|user}}{{$user.Name}}{{end}}</span>: {{.Text}}</p>
   </div>
 {{end}}

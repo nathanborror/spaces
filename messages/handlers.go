@@ -2,6 +2,7 @@ package messages
 
 import (
 	"net/http"
+
 	"github.com/nathanborror/gommon/auth"
 )
 
@@ -17,14 +18,14 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hash := r.FormValue("hash")
-	parent := r.FormValue("parent")
+	room := r.FormValue("room")
 	text := r.FormValue("text")
 
 	if hash == "" {
 		hash = GenerateMessageHash(text)
 	}
 
-	m := &Message{Hash: hash, Parent: parent, User: user.Hash, Text: text}
+	m := &Message{Hash: hash, Room: room, User: user.Hash, Text: text}
 	err = repo.Save(m)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

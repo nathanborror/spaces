@@ -64,7 +64,7 @@ Message.html = function(message) {
 
   html.data({
     'hash': message.hash,
-    'parent': message.parent,
+    'room': message.room,
     'user': message.user,
     'text': message.text,
   });
