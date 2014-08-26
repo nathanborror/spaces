@@ -49,12 +49,12 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	room, err := roomRepo.Load(hash)
 	check(err, w)
 
-	messages, err := messageRepo.List(hash)
+	ml, err := messageRepo.List(hash)
 	check(err, w)
 
 	render.Render(w, r, "room", map[string]interface{}{
 		"request":  r,
-		"messages": messages,
+		"messages": ml,
 		"room":     room,
 	})
 }
