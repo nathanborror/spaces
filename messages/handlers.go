@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/nathanborror/gommon/auth"
+	"github.com/nathanborror/spaces/dropbox"
 )
 
 var repo = MessageSQLRepository("db.sqlite3")
@@ -31,5 +32,11 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Check for any resources in message
+	dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
+
+	// Redirect to message (this is kind of a hack so we return the right JSON
+	// to the clients connected over websockets).
 	http.Redirect(w, r, "/m/"+hash, http.StatusFound)
 }

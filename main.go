@@ -12,12 +12,10 @@ import (
 	"github.com/nathanborror/gommon/hubspoke"
 	"github.com/nathanborror/gommon/markdown"
 	"github.com/nathanborror/gommon/render"
+	"github.com/nathanborror/spaces/dropbox"
 	"github.com/nathanborror/spaces/messages"
 	"github.com/nathanborror/spaces/rooms"
 )
-
-const appKey = "14l6emnb3m4jxye"
-const appSecret = "8gdnanccsg7ty7f"
 
 var cookieStore = sessions.NewCookieStore([]byte("something-very-very-secret"))
 var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
@@ -91,13 +89,13 @@ func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := fmt.Sprintf("https://api.dropbox.com/1/metadata/auto/%s", room.Folder)
-	response, err := Request("GET", url, token)
+	response, err := dropbox.Request("GET", url, token)
 	if err != nil {
 		panic(err)
 	}
 
-	var folder Entry
-	DecodeResponse(response, &folder)
+	var folder dropbox.Entry
+	dropbox.DecodeResponse(response, &folder)
 
 	render.Render(w, r, "room_folder", map[string]interface{}{
 		"request": r,
@@ -150,9 +148,8 @@ func main() {
 	r.HandleFunc("/m/{hash:[a-zA-Z0-9-]+}", messageHandler)
 
 	// Dropbox
-	http.HandleFunc("/dropbox", handleDropboxAuth)
-	http.HandleFunc("/callback", handleDropboxCallback)
-	http.HandleFunc("/dropbox/put", auth.LoginRequired(handleDropboxFilesPut))
+	http.HandleFunc("/dropbox", dropbox.HandleDropboxAuth)
+	http.HandleFunc("/callback", dropbox.HandleDropboxCallback)
 
 	r.HandleFunc("/ws", hubspoke.SpokeHandler)
 	r.HandleFunc("/", auth.LoginRequired(roomsHandler))
