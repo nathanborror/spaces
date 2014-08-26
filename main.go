@@ -8,12 +8,12 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
-	"github.com/nathanborror/spaces/messages"
-	"github.com/nathanborror/spaces/rooms"
 	"github.com/nathanborror/gommon/auth"
 	"github.com/nathanborror/gommon/hubspoke"
 	"github.com/nathanborror/gommon/markdown"
 	"github.com/nathanborror/gommon/render"
+	"github.com/nathanborror/spaces/messages"
+	"github.com/nathanborror/spaces/rooms"
 )
 
 const appKey = "14l6emnb3m4jxye"
