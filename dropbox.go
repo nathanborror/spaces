@@ -116,13 +116,14 @@ func DecodeResponse(r *http.Response, m interface{}) {
 }
 
 // Request allows you to make simple HTTP requests
-func Request(url string, token string) (resp *http.Response, err error) {
-	req, _ := http.NewRequest("GET", url, nil)
+func Request(method string, url string, token string) (resp *http.Response, err error) {
+	req, _ := http.NewRequest(method, url, nil)
 	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err = http.DefaultClient.Do(req)
 	return resp, err
 }
 
+// Handles Dropbox authentication using OAuth2
 func handleDropboxAuth(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/dropbox" {
 		http.NotFound(w, r)
@@ -143,6 +144,7 @@ func handleDropboxAuth(w http.ResponseWriter, r *http.Request) {
 		}.Encode(), 302)
 }
 
+// Handles Dropbox OAuth2 callback
 func handleDropboxCallback(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{Name: "csrf", MaxAge: -1})
 	state := r.FormValue("state")

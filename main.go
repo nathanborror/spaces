@@ -90,7 +90,8 @@ func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/dropbox", 302)
 	}
 
-	response, err := Request("https://api.dropbox.com/1/metadata/auto/DMX", token)
+	url := fmt.Sprintf("https://api.dropbox.com/1/metadata/auto/%s", room.Folder)
+	response, err := Request("GET", url, token)
 	if err != nil {
 		panic(err)
 	}
