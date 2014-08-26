@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-  {{template "title" .room.Name}}
+  {{template "title" .room.Folder}}
   {{template "header"}}
 </head>
 
 <body>
 
 <header>
-  <h1>{{.room.Name}}</h1>
+  <h1>{{.room.Folder}}</h1>
   <a class="ui-back" href="/r/{{.room.Hash}}">Back</a>
 </header>
 
