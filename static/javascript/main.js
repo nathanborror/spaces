@@ -38,7 +38,13 @@ MessageManager.submit = function(e) {
 
   Message.save(form.serialize());
 
-  form.find('input[name="text"]').val("");
+  var textInput = form.find('input[name="text"]');
+
+  // Check for resources that should be saved to shared folder
+  Message.renderResource(textInput.val())
+
+  // Clear inpupt field
+  textInput.val("");
 };
 
 var Message = {};
@@ -51,6 +57,21 @@ Message.renderSticker = function(text) {
     var cleaned = match[1];
     var title = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
     return 'Sticker'+title+'@2x.png'
+  }
+  return;
+};
+
+Message.renderResource = function(text) {
+  var re = /(http:\/\/|https:\/\/)docs.google.com\/a\/dropbox.com\/document\/d\/(.+)/g;
+  var match = re.exec(text);
+
+  if (match) {
+    var payload = JSON.stringify({
+      'url': match[0],
+      'resource_id': "document:"+match[2]
+    });
+
+    $.post('/dropbox/put', 'content='+payload);
   }
   return;
 };

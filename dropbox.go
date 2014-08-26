@@ -1,13 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
+
+	"github.com/nathanborror/gommon/render"
 )
 
 const (
@@ -121,6 +126,45 @@ func Request(method string, url string, token string) (resp *http.Response, err 
 	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err = http.DefaultClient.Do(req)
 	return resp, err
+}
+
+// Handles a Dropbox file put request
+func handleDropboxFilesPut(w http.ResponseWriter, r *http.Request) {
+	session, _ := cookieStore.Get(r, "dropbox")
+	token := fmt.Sprintf("%v", session.Values["token"])
+	if token == "<nil>" { // HACK
+		http.Redirect(w, r, "/dropbox", 302)
+	}
+
+	filename := "DMX/Test.gdoc"
+	url := fmt.Sprintf("https://api-content.dropbox.com/1/files_put/auto/%s", filename)
+
+	content := r.FormValue("content")
+	// gdoc := "1kzAMUyJe3-kChiyv-_VxTLRiYR_fNGQIOcTVfs8lofs"
+	// content := fmt.Sprintf("{\"url\": \"https://docs.google.com/a/dropbox.com/document/d/%s\", \"resource_id\": \"%s\"}", gdoc, gdoc)
+	size := int64(len(content))
+
+	log.Println(url)
+	log.Println(content)
+
+	req, _ := http.NewRequest("PUT", url, bytes.NewBufferString(content))
+	req.Header.Set("Content-Length", strconv.FormatInt(size, 10))
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	response, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(response)
+
+	var entry Entry
+	DecodeResponse(response, &entry)
+
+	render.Render(w, r, "room", map[string]interface{}{
+		"request": r,
+		"entry":   entry,
+	})
 }
 
 // Handles Dropbox authentication using OAuth2

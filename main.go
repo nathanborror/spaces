@@ -152,6 +152,7 @@ func main() {
 	// Dropbox
 	http.HandleFunc("/dropbox", handleDropboxAuth)
 	http.HandleFunc("/callback", handleDropboxCallback)
+	http.HandleFunc("/dropbox/put", auth.LoginRequired(handleDropboxFilesPut))
 
 	r.HandleFunc("/ws", hubspoke.SpokeHandler)
 	r.HandleFunc("/", auth.LoginRequired(roomsHandler))
