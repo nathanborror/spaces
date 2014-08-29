@@ -14,16 +14,22 @@
 <article>
   <form action="/r/save" method="post">
     <fieldset>
-      <p><input type="text" name="name" value="" placeholder="Name" class="ux-focus"></p>
+      <p><input type="text" name="name" value="{{if .room}}{{.room.Name}}{{end}}" placeholder="Name"{{if $.room}}{{else}} class="ux-focus"{{end}}></p>
+      {{if .room}}{{else}}
       <ul>
         {{range .users}}
           {{if $.user.Hash|ne .Hash}}
-          <li><label><input type="checkbox" name="members" value="{{.Hash}}"> {{.Name}}</label></li>
+            <li><label><input type="checkbox" name="members" value="{{.Hash}}"> {{.Name}}</label></li>
           {{end}}
         {{end}}
       </ul>
-      <p><input type="text" name="folder" value="" placeholder="/Shared/Folder/Path"></p>
-      <button type="submit">Create</button>
+      {{end}}
+      <p><input type="text" name="folder" value="{{if .room}}{{.room.Folder}}{{end}}" placeholder="/Shared/Folder/Path"></p>
+      <p><input type="hidden" name="hash" value="{{if .room}}{{.room.Hash}}{{end}}"></p>
+      <button type="submit">{{if .room}}Save{{else}}Create{{end}}</button>
+      {{if .room}}
+      <a class="ui-button ui-button-leave" href="/r/{{.room.Hash}}/leave">Leave</a>
+      {{end}}
     </fieldset>
   </form>
 </article>

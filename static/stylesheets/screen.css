@@ -8,6 +8,8 @@ body, textarea, input, button { font-family: "M1c"; font-weight: 400; font-size:
 
 header { position: fixed; top: 0px; left: 0px; right: 0px; margin: 0; padding: 16px 8px 0 8px; height: 48px; background: rgba(74,143,227,1); border-bottom: 1px solid rgba(0,0,0,.15); text-align: center; z-index: 1; }
 header h1 { font-size: 14px; color: rgba(255,255,255,1); font-weight: 500; }
+header h1 a { color: rgba(255,255,255,1); }
+header h1 a:hover { text-decoration: none; }
 header:after, article:after, footer:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 header .ui-back { position: absolute; top: 16px; left: 16px; color: #fff; }
 header .ui-back:hover { text-decoration: none; }
@@ -48,9 +50,10 @@ li { margin-bottom: 4px; line-height: 1.3; }
 .hidden { display: none; }
 
 /* Buttons */
-.ui-button { display: block; padding: 12px 32px; background-color: #fff; color: #777; border-radius: 4px;
+.ui-button { display: inline-block; padding: 12px 32px; background-color: #fff; color: #777; border-radius: 4px;
   box-shadow: 0 1px 0 0 rgba(0,0,0,.1); }
 .ui-button:hover { text-decoration: none; }
+.ui-button-leave { float: left; background-color: rgba(246,155,129,1); color: rgba(255,255,255,1); }
 
 /* Auth */
 .ui-auth { margin-top: 64px; }

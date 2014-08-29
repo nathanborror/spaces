@@ -8,7 +8,7 @@
 <body class="page-room">
 
 <header>
-  <h1>{{.room.Name}}</h1>
+  <h1><a href="/r/{{.room.Hash}}/edit">{{.room.Name}}</a></h1>
   <a class="ui-back" href="/">Back</a>
   <a class="ui-folder" href="/r/{{.room.Hash}}/folder">Folder</a>
   <a class="ui-members" href="/r/{{.room.Hash}}/members">Members</a>

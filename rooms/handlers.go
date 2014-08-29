@@ -55,6 +55,30 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/r/"+room.Hash, http.StatusFound)
 }
 
+func EditHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	u, _ := auth.GetAuthenticatedUser(r)
+
+	users, err := userRepo.List(100)
+	check(err, w)
+
+	room, err := repo.Load(hash)
+	check(err, w)
+
+	members, err := repo.ListMembers(room.Hash)
+	check(err, w)
+
+	render.Render(w, r, "room_form", map[string]interface{}{
+		"request": r,
+		"room":    room,
+		"users":   users,
+		"members": members,
+		"user":    u,
+	})
+}
+
 // FormHandler presents a form for creating a new room
 func FormHandler(w http.ResponseWriter, r *http.Request) {
 	u, _ := auth.GetAuthenticatedUser(r)
