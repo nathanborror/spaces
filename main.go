@@ -32,9 +32,24 @@ func ext(name string) string {
 	return ""
 }
 
+func memberOf(args ...interface{}) bool {
+	if len(args) == 2 {
+		user := args[1].(string)
+		room := args[0].(string)
+
+		_, err := roomMemberRepo.Load(room, user)
+		if err != nil {
+			return false
+		}
+		return true
+	}
+	return false
+}
+
 func init() {
 	_ = render.RegisterTemplateFunction("markdown", markdown.Markdown)
 	_ = render.RegisterTemplateFunction("ext", ext)
+	_ = render.RegisterTemplateFunction("memberOf", memberOf)
 
 	cookieStore.Options = &sessions.Options{
 		Domain:   "localhost",
@@ -57,6 +72,8 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
 
+	au, _ := auth.GetAuthenticatedUser(r)
+
 	room, err := roomRepo.Load(hash)
 	check(err, w)
 
@@ -65,30 +82,34 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 
 	render.Render(w, r, "room", map[string]interface{}{
 		"request":  r,
+		"authUser": au,
 		"messages": ml,
 		"room":     room,
 	})
 }
 
 func roomsHandler(w http.ResponseWriter, r *http.Request) {
-	u, err := auth.GetAuthenticatedUser(r)
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusFound)
-		return
-	}
+	au, _ := auth.GetAuthenticatedUser(r)
 
-	rooms, err := roomMemberRepo.List(u.Hash, 20)
+	rooms, err := roomMemberRepo.List(au.Hash, 20)
+	check(err, w)
+
+	joinable, err := roomMemberRepo.ListJoinable(au.Hash, 20)
 	check(err, w)
 
 	render.Render(w, r, "room_list", map[string]interface{}{
-		"request": r,
-		"rooms":   rooms,
+		"request":  r,
+		"authUser": au,
+		"rooms":    rooms,
+		"joinable": joinable,
 	})
 }
 
 func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
+
+	au, _ := auth.GetAuthenticatedUser(r)
 
 	room, err := roomRepo.Load(hash)
 	check(err, w)
@@ -112,15 +133,18 @@ func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, "room_folder", map[string]interface{}{
-		"request": r,
-		"room":    room,
-		"folder":  folder,
+		"request":  r,
+		"authUser": au,
+		"room":     room,
+		"folder":   folder,
 	})
 }
 
 func roomMemberHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
+
+	au, _ := auth.GetAuthenticatedUser(r)
 
 	room, err := roomRepo.Load(hash)
 	check(err, w)
@@ -129,9 +153,10 @@ func roomMemberHandler(w http.ResponseWriter, r *http.Request) {
 	check(err, w)
 
 	render.Render(w, r, "room_members", map[string]interface{}{
-		"request": r,
-		"room":    room,
-		"members": members,
+		"request":  r,
+		"authUser": au,
+		"room":     room,
+		"members":  members,
 	})
 }
 
@@ -140,6 +165,8 @@ func roomMemberHandler(w http.ResponseWriter, r *http.Request) {
 func messageHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
+
+	au, _ := auth.GetAuthenticatedUser(r)
 
 	message, err := messageRepo.Load(hash)
 	check(err, w)
@@ -151,22 +178,26 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 	check(err, w)
 
 	render.Render(w, r, "message", map[string]interface{}{
-		"request": r,
-		"message": message,
-		"room":    room,
-		"user":    user,
+		"request":  r,
+		"authUser": au,
+		"message":  message,
+		"room":     room,
+		"user":     user,
 	})
 }
 
 // Users
 
 func usersHandler(w http.ResponseWriter, r *http.Request) {
+	au, _ := auth.GetAuthenticatedUser(r)
+
 	users, err := authRepo.List(100)
 	check(err, w)
 
 	render.Render(w, r, "user_list", map[string]interface{}{
-		"request": r,
-		"users":   users,
+		"request":  r,
+		"authUser": au,
+		"users":    users,
 	})
 }
 
@@ -174,12 +205,15 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
 
+	au, _ := auth.GetAuthenticatedUser(r)
+
 	user, err := authRepo.Load(hash)
 	check(err, w)
 
 	render.Render(w, r, "user", map[string]interface{}{
-		"request": r,
-		"user":    user,
+		"request":  r,
+		"authUser": au,
+		"user":     user,
 	})
 }
 
