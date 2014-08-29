@@ -24,16 +24,14 @@
 {{define "footer"}}
   <footer>
     <a href="/" class="ui-home">Home</a>
-    · <a href="/r/create">Create room</a>
     {{if .request}}
-      {{if .request|isAuthenticated}}{{else}}
-      · <a class="ui-login" href="/login">Sign in</a>
-      {{end}}
-
       {{if .request|isAuthenticated}}
+      · <a href="/r/create">Create room</a>
       · <a class="ui-logout" href="/logout">Sign out</a>
       {{end}}
       · <a href="/dropbox">Dropbox</a>
+    {{else}}
+    · <a class="ui-login" href="/login">Sign in</a>
     {{end}}
   </footer>
 
