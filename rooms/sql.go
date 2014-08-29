@@ -122,6 +122,12 @@ func (r *sqlRoomMemberRepository) List(user string, limit int) ([]*Room, error) 
 	return rooms, err
 }
 
+func (r *sqlRoomMemberRepository) ListJoinable(user string, limit int) ([]*Room, error) {
+	rooms := []*Room{}
+	err := r.dbmap.Select(&rooms, "SELECT * FROM room WHERE hash NOT IN (SELECT room FROM roommember WHERE user = ?) ORDER BY created DESC LIMIT ?", user, limit)
+	return rooms, err
+}
+
 func (r *sqlRoomMemberRepository) Delete(hash string) error {
 	_, err := r.dbmap.Exec("DELETE FROM roommember WHERE hash=?", hash)
 	return err

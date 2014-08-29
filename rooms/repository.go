@@ -16,5 +16,6 @@ type RoomMemberRepository interface {
 	Load(room string, user string) (*RoomMember, error)
 	Save(roomMember *RoomMember) error
 	List(user string, limit int) ([]*Room, error)
+	ListJoinable(user string, limit int) ([]*Room, error)
 	Delete(hash string) error
 }

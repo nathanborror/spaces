@@ -17,6 +17,12 @@
     {{range .rooms}}
       {{template "renderRoom" .}}
     {{end}}
+
+    <div class="ui-row-section">Joinable</div>
+
+    {{range .joinable}}
+      {{template "renderRoom" .}}
+    {{end}}
   </div>
 </article>
 
