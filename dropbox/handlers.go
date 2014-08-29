@@ -19,7 +19,7 @@ var cookieStore = sessions.NewCookieStore([]byte("something-very-very-secret"))
 // HandleDropboxFilesPut handles a Dropbox file put request
 func HandleDropboxFilesPut(name string, text string, r *http.Request) {
 	// Check to see if a valid resource exists
-	re, _ := regexp.Compile("(http://|https://)docs.google.com/a/dropbox.com/document/d/(.+)")
+	re, _ := regexp.Compile("(http://|https://)docs.google.com/a/dropbox.com/(document|spreadsheets|presentation)/d/(.+)")
 	match := re.FindStringSubmatch(text)
 
 	if len(match) == 0 {
@@ -33,7 +33,7 @@ func HandleDropboxFilesPut(name string, text string, r *http.Request) {
 		// TODO: do something here
 	}
 
-	content := fmt.Sprintf("{\"url\": \"%s\", \"resource_id\": \"%s\"}", match[0], match[2])
+	content := fmt.Sprintf("{\"url\": \"%s\", \"resource_id\": \"%s\"}", match[0], match[3])
 	url := fmt.Sprintf("https://api-content.dropbox.com/1/files_put/auto/%s", name)
 	size := int64(len(content))
 
