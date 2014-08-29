@@ -92,20 +92,23 @@ func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
 	room, err := roomRepo.Load(hash)
 	check(err, w)
 
-	session, _ := cookieStore.Get(r, "dropbox")
-	token := fmt.Sprintf("%v", session.Values["token"])
-	if token == "<nil>" { // HACK
-		http.Redirect(w, r, "/dropbox", 302)
-	}
-
-	url := fmt.Sprintf("https://api.dropbox.com/1/metadata/auto/%s", room.Folder)
-	response, err := dropbox.Request("GET", url, token)
-	if err != nil {
-		panic(err)
-	}
-
 	var folder dropbox.Entry
-	dropbox.DecodeResponse(response, &folder)
+
+	if room.Folder != "" {
+		session, _ := cookieStore.Get(r, "dropbox")
+		token := fmt.Sprintf("%v", session.Values["token"])
+		if token == "<nil>" { // HACK
+			http.Redirect(w, r, "/dropbox", 302)
+		}
+
+		url := fmt.Sprintf("https://api.dropbox.com/1/metadata/auto/%s", room.Folder)
+		response, err := dropbox.Request("GET", url, token)
+		if err != nil {
+			panic(err)
+		}
+
+		dropbox.DecodeResponse(response, &folder)
+	}
 
 	render.Render(w, r, "room_folder", map[string]interface{}{
 		"request": r,
