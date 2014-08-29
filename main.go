@@ -22,8 +22,17 @@ var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
 var messageRepo = messages.MessageSQLRepository("db.sqlite3")
 var authRepo = auth.AuthSQLRepository("db.sqlite3")
 
+func ext(name string) string {
+	e := strings.Split(name, ".")
+	if len(e) > 1 {
+		return e[len(e)-1]
+	}
+	return ""
+}
+
 func init() {
 	_ = render.RegisterTemplateFunction("markdown", markdown.Markdown)
+	_ = render.RegisterTemplateFunction("ext", ext)
 
 	cookieStore.Options = &sessions.Options{
 		Domain:   "localhost",
