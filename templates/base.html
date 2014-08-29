@@ -73,3 +73,14 @@
     </h4>
   </div>
 {{end}}
+
+{{define "renderMember"}}
+  <div class="ui-row">
+    <h4>
+      <a href="/u/{{.Hash}}">
+        <span class="ui-title">{{.Name}}</span>
+        <span class="ui-subtitle">{{.Email}}</span>
+      </a>
+    </h4>
+  </div>
+{{end}}

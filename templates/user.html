@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" .user.Name}}
+  {{template "header"}}
+</head>
+
+<body class="page-room">
+
+<header>
+  <h1>{{.user.Name}}</h1>
+  <a class="ui-back" href="/">Back</a>
+</header>
+
+<article>
+  <div class="ui-list">
+    {{range .rooms}}
+      <div class="ui-row">
+        <h4>
+          <a href="#">
+            <span class="ui-title">{{.Name}}</span>
+          </a>
+        </h4>
+      </div>
+    {{end}}
+  </div>
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" "Users"}}
+  {{template "header"}}
+</head>
+
+<body>
+
+<header>
+  <h1>Users</h1>
+</header>
+
+<article>
+
+  <div class="ui-list">
+    {{range .users}}
+      {{template "renderMember"}}
+    {{end}}
+  </div>
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>

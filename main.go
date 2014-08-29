@@ -20,6 +20,7 @@ import (
 
 var cookieStore = sessions.NewCookieStore([]byte("something-very-very-secret"))
 var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
+var roomMemberRepo = rooms.RoomMemberSQLRepository("db.sqlite3")
 var messageRepo = messages.MessageSQLRepository("db.sqlite3")
 var authRepo = auth.AuthSQLRepository("db.sqlite3")
 
@@ -70,18 +71,18 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func roomsHandler(w http.ResponseWriter, r *http.Request) {
-	rooms, err := roomRepo.List(20)
+	u, err := auth.GetAuthenticatedUser(r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	rooms, err := roomMemberRepo.List(u.Hash, 20)
 	check(err, w)
 
 	render.Render(w, r, "room_list", map[string]interface{}{
 		"request": r,
 		"rooms":   rooms,
-	})
-}
-
-func roomFormHandler(w http.ResponseWriter, r *http.Request) {
-	render.Render(w, r, "room_form", map[string]interface{}{
-		"request": r,
 	})
 }
 
@@ -117,6 +118,23 @@ func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func roomMemberHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	room, err := roomRepo.Load(hash)
+	check(err, w)
+
+	members, err := roomRepo.ListMembers(room.Hash)
+	check(err, w)
+
+	render.Render(w, r, "room_members", map[string]interface{}{
+		"request": r,
+		"room":    room,
+		"members": members,
+	})
+}
+
 // Message Handlers
 
 func messageHandler(w http.ResponseWriter, r *http.Request) {
@@ -140,6 +158,31 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// Users
+
+func usersHandler(w http.ResponseWriter, r *http.Request) {
+	users, err := authRepo.List(100)
+	check(err, w)
+
+	render.Render(w, r, "user_list", map[string]interface{}{
+		"request": r,
+		"users":   users,
+	})
+}
+
+func userHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	user, err := authRepo.Load(hash)
+	check(err, w)
+
+	render.Render(w, r, "user", map[string]interface{}{
+		"request": r,
+		"user":    user,
+	})
+}
+
 var r = mux.NewRouter()
 
 func main() {
@@ -149,12 +192,17 @@ func main() {
 	r.HandleFunc("/login", auth.LoginHandler)
 	r.HandleFunc("/logout", auth.LogoutHandler)
 	r.HandleFunc("/register", auth.RegisterHandler)
+	r.HandleFunc("/u", auth.LoginRequired(usersHandler))
+	r.HandleFunc("/u/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(userHandler))
 
 	// Room
-	r.HandleFunc("/r/create", auth.LoginRequired(roomFormHandler))
+	r.HandleFunc("/r/create", auth.LoginRequired(rooms.FormHandler))
 	r.HandleFunc("/r/save", auth.LoginRequired(rooms.SaveHandler))
-	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}", roomHandler)
-	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/folder", roomFolderHandler)
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(roomHandler))
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/folder", auth.LoginRequired(roomFolderHandler))
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/members", auth.LoginRequired(roomMemberHandler))
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/join", auth.LoginRequired(rooms.JoinHandler))
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/leave", auth.LoginRequired(rooms.LeaveHandler))
 
 	// Message
 	r.HandleFunc("/m/save", auth.LoginRequired(messages.SaveHandler))

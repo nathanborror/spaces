@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" .room.Name}}
+  {{template "header"}}
+</head>
+
+<body>
+
+<header>
+  <h1>{{.room.Name}} members</h1>
+  <a class="ui-back" href="/r/{{.room.Hash}}">Back</a>
+</header>
+
+<article>
+
+  <div class="ui-list">
+    {{range .members}}
+      {{template "renderMember" .}}
+    {{end}}
+  </div>
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>

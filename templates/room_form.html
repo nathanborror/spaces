@@ -14,8 +14,14 @@
 <article>
   <form action="/r/save" method="post">
     <fieldset>
-      <p><input type="text" name="name" value="" placeholder="Name"></p>
-      <p><input type="text" name="users" value="" placeholder="People"></p>
+      <p><input type="text" name="name" value="" placeholder="Name" class="ux-focus"></p>
+      <ul>
+        {{range .users}}
+          {{if $.user.Hash|ne .Hash}}
+          <li><label><input type="checkbox" name="members" value="{{.Hash}}"> {{.Name}}</label></li>
+          {{end}}
+        {{end}}
+      </ul>
       <p><input type="text" name="folder" value="" placeholder="/Shared/Folder/Path"></p>
       <button type="submit">Create</button>
     </fieldset>

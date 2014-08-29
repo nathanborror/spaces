@@ -4,22 +4,33 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/nathanborror/gommon/auth"
+	"github.com/nathanborror/gommon/render"
 )
 
 var repo = RoomSQLRepository("db.sqlite3")
+var roomMemberRepo = RoomMemberSQLRepository("db.sqlite3")
 var userRepo = auth.AuthSQLRepository("db.sqlite3")
+
+func check(err error, w http.ResponseWriter) {
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
 
 // SaveHandler saves a item
 func SaveHandler(w http.ResponseWriter, r *http.Request) {
+	u, _ := auth.GetAuthenticatedUser(r)
+
 	hash := r.FormValue("hash")
 	name := r.FormValue("name")
-	users := r.FormValue("users")
 	folder := r.FormValue("folder")
 	created := time.Now()
 
 	if hash == "" {
-		hash = GenerateItemHash(name)
+		hash = GenerateRoomHash(name)
 	}
 
 	room, err := repo.Load(hash)
@@ -27,11 +38,67 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 		created = room.Created
 	}
 
-	room = &Room{Hash: hash, Users: users, Name: name, Folder: folder, Created: created}
+	room = &Room{Hash: hash, Name: name, Folder: folder, Created: created}
 	err = repo.Save(room)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	check(err, w)
+
+	// Add members to room
+	members := r.Form["members"]
+	members = append(members, u.Hash)
+	for _, user := range members {
+		hash = GenerateRoomMemberHash(room.Hash, user)
+		rm := &RoomMember{Hash: hash, User: user, Room: room.Hash}
+		err = roomMemberRepo.Save(rm)
+		check(err, w)
 	}
-	http.Redirect(w, r, "/r/"+hash, http.StatusFound)
+
+	http.Redirect(w, r, "/r/"+room.Hash, http.StatusFound)
+}
+
+// FormHandler presents a form for creating a new room
+func FormHandler(w http.ResponseWriter, r *http.Request) {
+	u, _ := auth.GetAuthenticatedUser(r)
+
+	users, err := userRepo.List(100)
+	check(err, w)
+
+	render.Render(w, r, "room_form", map[string]interface{}{
+		"request": r,
+		"users":   users,
+		"user":    u,
+	})
+}
+
+// LeaveHandler allows people to leave rooms
+func LeaveHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	user, _ := auth.GetAuthenticatedUser(r)
+
+	membership, err := roomMemberRepo.Load(hash, user.Hash)
+	check(err, w)
+
+	err = roomMemberRepo.Delete(membership.Hash)
+	check(err, w)
+
+	http.Redirect(w, r, "/", 302)
+}
+
+// JoinHandler allows people to join rooms
+func JoinHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	user, _ := auth.GetAuthenticatedUser(r)
+
+	room, err := repo.Load(hash)
+	check(err, w)
+
+	hash = GenerateRoomMemberHash(room.Hash, user.Hash)
+	rm := &RoomMember{Hash: hash, User: user.Hash, Room: room.Hash}
+	err = roomMemberRepo.Save(rm)
+	check(err, w)
+
+	http.Redirect(w, r, "/r/"+room.Hash, 302)
 }
