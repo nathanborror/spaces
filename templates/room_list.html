@@ -18,10 +18,12 @@
       {{template "renderRoom" .}}
     {{end}}
 
-    <div class="ui-row-section">Joinable</div>
+    {{if .joinable}}
+      <div class="ui-row-section">Joinable</div>
 
-    {{range .joinable}}
-      {{template "renderRoom" .}}
+      {{range .joinable}}
+        {{template "renderRoom" .}}
+      {{end}}
     {{end}}
   </div>
 </article>
