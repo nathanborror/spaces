@@ -1,6 +1,7 @@
 
 var kActionRequest = 'request';
 var kActionSubscribe = 'subscribe';
+var kPort = '8082';
 
 window.SOCKET = new WebSocket("ws://"+window.location.host+"/ws");
 
@@ -29,7 +30,7 @@ window.SOCKET.onmessage = function(e) {
 
 // on registers a callback when a new message on channel `channel` occurs.
 window.SOCKET.subscribe = function(channel, callback) {
-  var payload = JSON.stringify({'url': channel, 'action': kActionSubscribe});
+  var payload = JSON.stringify({'url': channel, 'action': kActionSubscribe, 'port': kPort});
   if (!window.SOCKET.subscriptions[channel]) {
     window.SOCKET.subscriptions[channel] = [];
   }
@@ -42,6 +43,6 @@ window.SOCKET.unsubscribe = function(channel) {
 }
 
 window.SOCKET.request = function(url) {
-  var payload = JSON.stringify({'url': url, 'action': kActionRequest});
+  var payload = JSON.stringify({'url': url, 'action': kActionRequest, 'port': kPort});
   window.SOCKET.send(payload);
 };
