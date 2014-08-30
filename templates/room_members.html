@@ -8,15 +8,14 @@
 <body>
 
 <header>
-  <h1>{{.room.Name}} members</h1>
-  <a class="ui-back" href="/r/{{.room.Hash}}">Back</a>
+  <h1>{{.room.Name}} Members</h1>
 </header>
 
 <article>
 
   <div class="ui-list">
     {{range .members}}
-      {{template "renderMember" .}}
+      {{template "renderUser" .}}
     {{end}}
   </div>
 </article>

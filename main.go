@@ -210,6 +210,9 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	user, err := authRepo.Load(hash)
 	check(err, w)
 
+	// TODO:
+	// Create a OneOnOne thread with this person if it doesn't already exist
+
 	render.Render(w, r, "user", map[string]interface{}{
 		"request":  r,
 		"authUser": au,

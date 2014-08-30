@@ -8,13 +8,14 @@
 <body>
 
 <header>
-  <h1>Create room</h1>
+  <h1>{{if .room}}Edit {{.room.Name}}{{else}}Create Room{{end}}</h1>
 </header>
 
 <article>
   <form action="/r/save" method="post">
     <fieldset>
       <p><input type="text" name="name" value="{{if .room}}{{.room.Name}}{{end}}" placeholder="Name"{{if $.room}}{{else}} class="ux-focus"{{end}}></p>
+      <p><input type="text" name="folder" value="{{if .room}}{{.room.Folder}}{{end}}" placeholder="/Shared/Folder/Path"></p>
       {{if .room}}{{else}}
       <ul>
         {{range .users}}
@@ -24,7 +25,6 @@
         {{end}}
       </ul>
       {{end}}
-      <p><input type="text" name="folder" value="{{if .room}}{{.room.Folder}}{{end}}" placeholder="/Shared/Folder/Path"></p>
       <p><input type="hidden" name="hash" value="{{if .room}}{{.room.Hash}}{{end}}"></p>
       <button type="submit">{{if .room}}Save{{else}}Create{{end}}</button>
       {{if .room}}

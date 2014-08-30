@@ -55,6 +55,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/r/"+room.Hash, http.StatusFound)
 }
 
+// EditHandler handles editing of rooms
 func EditHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
