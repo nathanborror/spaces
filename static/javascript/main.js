@@ -46,18 +46,6 @@ MessageManager.submit = function(e) {
 
 var Message = {};
 
-Message.renderSticker = function(text) {
-  var re = /:(\w+):/g;
-  var match = re.exec(text);
-
-  if (match) {
-    var cleaned = match[1];
-    var title = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-    return 'Sticker'+title+'@2x.png'
-  }
-  return;
-};
-
 // HTML returns HTML necessary to render an message.
 Message.html = function(message) {
   var text = message.text;
@@ -66,15 +54,47 @@ Message.html = function(message) {
     text = text.slice(0,-1);
   }
 
-  var sticker = Message.renderSticker(text);
-  if (sticker) {
-    text = '<img class="ui-message-sticker" src="/static/images/'+sticker+'">';
+  // Actions
+  var stickers = '';
+  var command = '';
+
+  for (var i=0; i<message.actions.length; i++) {
+    var action = message.actions[i];
+    switch(action.type) {
+      case 'sticker': {
+        stickers += '<img class="ui-message-sticker" src="/static/images/stickers/'+action.resource+'">';
+        break;
+      }
+      case 'join': {
+        command = 'You joined '+action.resource;
+        break;
+      }
+      case 'msg': {
+        command = 'You messaged '+action.resource;
+        break;
+      }
+      case 'leave': {
+        command = 'You left '+action.resource;
+        break;
+      }
+    }
   }
 
-  var html = $(''+
-    '<div class="ui-message" id="'+message.hash+'">'+
-      '<p><span class="ui-message-user">'+message.user.name+':</span> '+text+'</p>'+
-    '</div>');
+  if (stickers != '') {
+    text = '<div class="ui-message-stickers">'+stickers+'</div>';
+  }
+
+  if (command != '') {
+    var html = $(''+
+      '<div class="ui-message ui-message-command" id="'+message.hash+'">'+
+        '<p>'+command+'</p>'+
+      '</div>');
+  } else {
+    var html = $(''+
+      '<div class="ui-message" id="'+message.hash+'">'+
+        '<p><span class="ui-message-user">'+message.user.name+':</span> '+text+'</p>'+
+      '</div>');
+  }
 
   html.data({
     'hash': message.hash,

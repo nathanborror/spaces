@@ -26,8 +26,15 @@ type Message struct {
 // MessageList returns a list of Messages
 type MessageList []*Message
 
-// UserObject returns the actual User instance
-func (m Message) UserObject() *auth.User {
+// MessageAction defines an action thats encoded in the message (e.g. stickers, room events, etc.)
+type MessageAction struct {
+	Type     string `json:"type"`
+	Resource string `json:"resource"`
+	Raw      string `json:"raw"`
+}
+
+// GetUser returns the actual User instance
+func (m Message) GetUser() *auth.User {
 	u, err := authRepo.Load(m.User)
 	if err != nil {
 		return nil
@@ -35,12 +42,24 @@ func (m Message) UserObject() *auth.User {
 	return u
 }
 
+// GetActions returns actions (e.g. stickers, joins, etc.)
+func (m Message) GetActions() []*MessageAction {
+	commands := FindCommands(m.Text)
+	if len(commands) > 0 {
+		return commands
+	}
+
+	stickers := FindStickers(m.Text)
+	return stickers
+}
+
 // MarshalPrepare output
 func (m Message) MarshalPrepare() interface{} {
 	return struct {
 		Message
-		User *auth.User `json:"user"`
-	}{m, m.UserObject()}
+		User    *auth.User       `json:"user"`
+		Actions []*MessageAction `json:"actions"`
+	}{m, m.GetUser(), m.GetActions()}
 }
 
 // MarshalPrepare prepares a list of messages
