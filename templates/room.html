@@ -23,11 +23,13 @@
   <div class="ui-list">
   </div>
 
+  {{if .authUser.Hash|memberOf $.room.Hash}}
   <form action="/m/save" method="post" class="ui-room-form" autocomplete="off">
     <p><input type="text" name="text" value="" placeholder="Say something..." class="ux-focus" autocomplete="off"></p>
     <input type="hidden" name="room" value="{{.room.Hash}}">
     <button type="submit" class="hidden">Post</button>
   </form>
+  {{end}}
 </article>
 
 {{template "alert"}}
