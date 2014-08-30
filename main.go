@@ -220,6 +220,18 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func registerTokenHandler(w http.ResponseWriter, r *http.Request) {
+	au, _ := auth.GetAuthenticatedUser(r)
+
+	au.PushToken = r.FormValue("token")
+	au.PushType = "ios"
+
+	err := authRepo.Save(au)
+	check(err, w)
+
+	http.Redirect(w, r, "/", 302)
+}
+
 var r = mux.NewRouter()
 
 func main() {
@@ -229,6 +241,7 @@ func main() {
 	r.HandleFunc("/login", auth.LoginHandler)
 	r.HandleFunc("/logout", auth.LogoutHandler)
 	r.HandleFunc("/register", auth.RegisterHandler)
+	r.HandleFunc("/token", auth.LoginRequired(registerTokenHandler))
 	r.HandleFunc("/u", auth.LoginRequired(usersHandler))
 	r.HandleFunc("/u/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(userHandler))
 
