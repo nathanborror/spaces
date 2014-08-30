@@ -13,6 +13,7 @@ import (
 	"github.com/nathanborror/gommon/hubspoke"
 	"github.com/nathanborror/gommon/markdown"
 	"github.com/nathanborror/gommon/render"
+	"github.com/nathanborror/spaces/devices"
 	"github.com/nathanborror/spaces/dropbox"
 	"github.com/nathanborror/spaces/messages"
 	"github.com/nathanborror/spaces/rooms"
@@ -220,18 +221,6 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func registerTokenHandler(w http.ResponseWriter, r *http.Request) {
-	au, _ := auth.GetAuthenticatedUser(r)
-
-	au.PushToken = r.FormValue("token")
-	au.PushType = "ios"
-
-	err := authRepo.Save(au)
-	check(err, w)
-
-	http.Redirect(w, r, "/", 302)
-}
-
 var r = mux.NewRouter()
 
 func main() {
@@ -241,9 +230,11 @@ func main() {
 	r.HandleFunc("/login", auth.LoginHandler)
 	r.HandleFunc("/logout", auth.LogoutHandler)
 	r.HandleFunc("/register", auth.RegisterHandler)
-	r.HandleFunc("/token", auth.LoginRequired(registerTokenHandler))
 	r.HandleFunc("/u", auth.LoginRequired(usersHandler))
 	r.HandleFunc("/u/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(userHandler))
+
+	// Devices
+	r.HandleFunc("/d/save", auth.LoginRequired(devices.SaveHandler))
 
 	// Room
 	r.HandleFunc("/r/create", auth.LoginRequired(rooms.FormHandler))
