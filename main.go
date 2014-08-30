@@ -10,10 +10,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/nathanborror/gommon/auth"
-	"github.com/nathanborror/gommon/hubspoke"
 	"github.com/nathanborror/gommon/markdown"
 	"github.com/nathanborror/gommon/render"
-	"github.com/nathanborror/spaces/devices"
+	"github.com/nathanborror/gommon/spokes"
+	"github.com/nathanborror/gommon/tokens"
 	"github.com/nathanborror/spaces/dropbox"
 	"github.com/nathanborror/spaces/messages"
 	"github.com/nathanborror/spaces/rooms"
@@ -224,7 +224,7 @@ func userHandler(w http.ResponseWriter, r *http.Request) {
 var r = mux.NewRouter()
 
 func main() {
-	go hubspoke.Hub.Run()
+	go spokes.Hub.Run()
 
 	// Users
 	r.HandleFunc("/login", auth.LoginHandler)
@@ -233,8 +233,8 @@ func main() {
 	r.HandleFunc("/u", auth.LoginRequired(usersHandler))
 	r.HandleFunc("/u/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(userHandler))
 
-	// Devices
-	r.HandleFunc("/d/save", auth.LoginRequired(devices.SaveHandler))
+	// Tokens
+	r.HandleFunc("/t/save", auth.LoginRequired(tokens.SaveHandler))
 
 	// Room
 	r.HandleFunc("/r/create", auth.LoginRequired(rooms.FormHandler))
@@ -254,7 +254,7 @@ func main() {
 	http.HandleFunc("/dropbox", dropbox.HandleDropboxAuth)
 	http.HandleFunc("/callback", dropbox.HandleDropboxCallback)
 
-	r.HandleFunc("/ws", hubspoke.SpokeHandler)
+	r.HandleFunc("/ws", spokes.SpokeHandler)
 	r.HandleFunc("/", auth.LoginRequired(roomsHandler))
 
 	http.Handle("/", r)
