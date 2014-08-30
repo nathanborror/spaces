@@ -26,6 +26,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 
 	hash := r.FormValue("hash")
 	name := r.FormValue("name")
+	kind := Open
 	folder := r.FormValue("folder")
 	created := time.Now()
 
@@ -38,7 +39,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 		created = room.Created
 	}
 
-	room = &Room{Hash: hash, Name: name, Folder: folder, Created: created}
+	room = &Room{Hash: hash, Name: name, Kind: kind, Folder: folder, Created: created}
 	err = repo.Save(room)
 	check(err, w)
 
