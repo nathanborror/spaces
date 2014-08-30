@@ -36,6 +36,9 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	// Check for any resources in message
 	dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
 
+	// Push TODO: Replace hardcoded token and push all non-connected users
+	go Push(m.Text, "858d4684066c91b131103527e636a94bf9f87e3d25c51fa5e5ea3f94aeb71d33")
+
 	// Redirect to message (this is kind of a hack so we return the right JSON
 	// to the clients connected over websockets).
 	http.Redirect(w, r, "/m/"+hash, http.StatusFound)
