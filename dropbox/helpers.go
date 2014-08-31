@@ -3,7 +3,6 @@ package dropbox
 import (
 	"encoding/json"
 	"net/http"
-	"net/url"
 	"time"
 )
 
@@ -15,19 +14,6 @@ const (
 	// AppSecret is the Dropbox App Secret
 	AppSecret = "8gdnanccsg7ty7f"
 )
-
-func getCallbackURL(r *http.Request) string {
-	scheme := "http"
-	forwarded := r.Header.Get("X-Forwarded-Proto")
-	if len(forwarded) > 0 {
-		scheme = forwarded
-	}
-	return (&url.URL{
-		Scheme: scheme,
-		Host:   r.Host,
-		Path:   "/callback",
-	}).String()
-}
 
 // DecodeResponse returns a prepared interface to work with
 func DecodeResponse(r *http.Response, m interface{}) {

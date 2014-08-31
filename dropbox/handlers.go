@@ -65,7 +65,7 @@ func HandleDropboxAuth(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "https://www.dropbox.com/1/oauth2/authorize?"+
 		url.Values{
 			"client_id":     {AppKey},
-			"redirect_uri":  {getCallbackURL(r)},
+			"redirect_uri":  {"https://spaces.nthn.me/callback"},
 			"response_type": {"code"},
 			"state":         {csrf},
 		}.Encode(), 302)
