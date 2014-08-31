@@ -13,6 +13,8 @@ const (
 	AppKey = "14l6emnb3m4jxye"
 	// AppSecret is the Dropbox App Secret
 	AppSecret = "8gdnanccsg7ty7f"
+	// AppCallback is the callback url
+	AppCallback = "https://spaces.nthn.me/callback"
 )
 
 // DecodeResponse returns a prepared interface to work with
