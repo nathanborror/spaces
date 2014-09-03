@@ -13,7 +13,7 @@
   <form action="/register" method="post">
     <fieldset>
       <input type="text" name="name" placeholder="Name" class="ux-focus">
-      <input type="text" name="email" value="{{if .}}{{.user.Email}}{{end}}" placeholder="Your email address">
+      <input type="email" name="email" value="{{if .}}{{.user.Email}}{{end}}" placeholder="Your email address">
       <input type="password" name="password" value="" placeholder="Your password">
       <button type="submit">Register</button>
     </fieldset>
