@@ -52,8 +52,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	for _, m := range members {
 		users = append(users, m.Hash)
 	}
-	err = tokenRepo.Push(users, m.Text, "SpacesCert.pem", "SpacesKeyNoEnc.pem")
-	check(err, w)
+	go tokenRepo.Push(users, m.Text, "SpacesCert.pem", "SpacesKeyNoEnc.pem")
 
 	// Redirect to message (this is kind of a hack so we return the right JSON
 	// to the clients connected over websockets).
