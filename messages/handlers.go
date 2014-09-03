@@ -43,7 +43,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	check(err, w)
 
 	// Check for any resources in message
-	dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
+	go dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
 
 	// Push members
 	go PushMembers(room, m.Text)
