@@ -45,14 +45,8 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	// Check for any resources in message
 	dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
 
-	members, err := roomRepo.ListMembers(room)
-	check(err, w)
-
-	users := []string{}
-	for _, m := range members {
-		users = append(users, m.Hash)
-	}
-	go tokenRepo.Push(users, m.Text, "SpacesCert.pem", "SpacesKeyNoEnc.pem")
+	// Push members
+	go PushMembers(room, m.Text)
 
 	// Redirect to message (this is kind of a hack so we return the right JSON
 	// to the clients connected over websockets).

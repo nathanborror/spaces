@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
+	"log"
 	"regexp"
 	"time"
 )
@@ -46,4 +47,19 @@ func FindCommands(text string) []*MessageAction {
 	}
 
 	return actions
+}
+
+// PushMembers sends APNS push notifications to the members of a room
+func PushMembers(room string, text string) {
+	members, err := roomRepo.ListMembers(room)
+	if err != nil {
+		log.Println("[Push]: ", err)
+	}
+
+	users := []string{}
+	for _, m := range members {
+		users = append(users, m.Hash)
+	}
+
+	tokenRepo.Push(users, text, "SpacesCert.pem", "SpacesKeyNoEnc.pem")
 }
