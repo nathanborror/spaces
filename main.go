@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -74,6 +75,7 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	au, _ := auth.GetAuthenticatedUser(r)
+	authRepo.Ping(au) // Ping user
 
 	room, err := roomRepo.Load(hash)
 	check(err, w)
@@ -91,6 +93,7 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 
 func roomsHandler(w http.ResponseWriter, r *http.Request) {
 	au, _ := auth.GetAuthenticatedUser(r)
+	authRepo.Ping(au) // Ping user
 
 	rooms, err := roomMemberRepo.List(au.Hash, 20)
 	check(err, w)
@@ -98,11 +101,16 @@ func roomsHandler(w http.ResponseWriter, r *http.Request) {
 	joinable, err := roomMemberRepo.ListJoinable(au.Hash, 20)
 	check(err, w)
 
+	users, err := authRepo.List(20)
+	check(err, w)
+
 	render.Render(w, r, "room_list", map[string]interface{}{
 		"request":  r,
 		"authUser": au,
 		"rooms":    rooms,
 		"joinable": joinable,
+		"users":    users,
+		"now":      time.Now().UTC(),
 	})
 }
 
@@ -245,6 +253,7 @@ func main() {
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/members", auth.LoginRequired(roomMemberHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/join", auth.LoginRequired(rooms.JoinHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/leave", auth.LoginRequired(rooms.LeaveHandler))
+	r.HandleFunc("/r", auth.LoginRequired(roomsHandler))
 
 	// Message
 	r.HandleFunc("/m/save", auth.LoginRequired(messages.SaveHandler))

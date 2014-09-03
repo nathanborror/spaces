@@ -77,7 +77,8 @@
   <div class="ui-row">
     <h4>
       <a href="/u/{{.Hash}}">
-        <span class="ui-title">{{.Name}}</span>
+        <span class="ui-profile"></span>
+        <span class="ui-title">{{.Name}} {{if .IsActive}}<span class="ui-presence-active"></span>{{end}}</span>
         <span class="ui-subtitle">{{.Email}}</span>
       </a>
     </h4>

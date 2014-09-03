@@ -23,11 +23,12 @@ func check(err error, w http.ResponseWriter) {
 
 // SaveHandler saves a item
 func SaveHandler(w http.ResponseWriter, r *http.Request) {
-	user, err := auth.GetAuthenticatedUser(r)
+	au, err := auth.GetAuthenticatedUser(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
+	authRepo.Ping(au) // Ping user
 
 	hash := r.FormValue("hash")
 	room := r.FormValue("room")
@@ -37,7 +38,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 		hash = GenerateMessageHash(text)
 	}
 
-	m := &Message{Hash: hash, Room: room, User: user.Hash, Text: text}
+	m := &Message{Hash: hash, Room: room, User: au.Hash, Text: text}
 	err = repo.Save(m)
 	check(err, w)
 

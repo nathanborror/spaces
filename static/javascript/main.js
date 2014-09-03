@@ -1,4 +1,3 @@
-
 var handleMessage = function(data) {
   MessageManager.update(data);
 };
@@ -108,12 +107,20 @@ Message.html = function(message) {
 
 // Save saves a new message.
 Message.save = function(data, complete) {
-  $.post('/m/save', data, function(data) {
-    if (complete) {
-      complete(data);
+  $.ajax({
+    type: 'POST',
+    url: '/m/save',
+    data: data,
+    success: function(data) {
+      if (complete) {
+        complete(data);
+      }
+      window.SOCKET.request('/r/'+data.room.hash);
+    }.bind(this),
+    error: function(xhr, status, error) {
+      alert('There was '+status+' when trying to send this message. Please contact nathan@dropbox.com.');
     }
-    window.SOCKET.request('/r/'+data.room.hash);
-  }.bind(this));
+  });
 };
 
 // Insert adds message into a given room
