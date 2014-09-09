@@ -65,12 +65,16 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	messages, err := messageRepo.List(hash, 20)
 	check(err, w)
 
+	members, err := roomMemberRepo.ListMembers(room.Hash)
+	check(err, w)
+
 	isMember, _ := roomMemberRepo.Load(room.Hash, userHash)
 
 	render.Render(w, r, "room", map[string]interface{}{
 		"request":  r,
 		"messages": messages,
 		"room":     room,
+		"members":  members,
 		"isMember": isMember,
 	})
 }

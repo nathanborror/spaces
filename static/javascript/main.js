@@ -23,7 +23,8 @@ MessageManager.update = function(data) {
   // Insert any hashes that don't exist.
   for (var i=0; i<diff.length; i++) {
     var message = _.findWhere(data.messages, {'hash': diff[i]});
-    var html = Message.html(message);
+    var user = _.findWhere(data.members, {'hash': message.user})
+    var html = Message.html(message, user);
     Message.insert(html, message_list);
   }
 
@@ -46,7 +47,7 @@ MessageManager.submit = function(e) {
 var Message = {};
 
 // HTML returns HTML necessary to render an message.
-Message.html = function(message) {
+Message.html = function(message, user) {
   var text = message.text;
 
   if (message.text.slice(-1) == "?") {
@@ -91,7 +92,7 @@ Message.html = function(message) {
   } else {
     var html = $(''+
       '<div class="ui-message" id="'+message.hash+'">'+
-        '<p><span class="ui-message-user">'+message.user+':</span> '+text+'</p>'+
+        '<p><a href="/u/'+user.hash+'" class="ui-message-user">'+user.name+':</a> '+text+'</p>'+
       '</div>');
   }
 
