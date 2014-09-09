@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -74,51 +73,27 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
 
-	au, _ := auth.GetAuthenticatedUser(r)
-	authRepo.Ping(au) // Ping user
+	userHash, _ := auth.GetAuthenticatedUserHash(r)
 
 	room, err := roomRepo.Load(hash)
 	check(err, w)
 
-	ml, err := messageRepo.List(hash, 20)
+	messages, err := messageRepo.List(hash, 20)
 	check(err, w)
+
+	isMember, _ := roomMemberRepo.Load(room.Hash, userHash)
 
 	render.Render(w, r, "room", map[string]interface{}{
 		"request":  r,
-		"authUser": au,
-		"messages": ml,
+		"messages": messages,
 		"room":     room,
-	})
-}
-
-func roomsHandler(w http.ResponseWriter, r *http.Request) {
-	au, _ := auth.GetAuthenticatedUser(r)
-	authRepo.Ping(au) // Ping user
-
-	rooms, err := roomMemberRepo.List(au.Hash, 20)
-	check(err, w)
-
-	joinable, err := roomMemberRepo.ListJoinable(au.Hash, 20)
-	check(err, w)
-
-	users, err := authRepo.List(20)
-	check(err, w)
-
-	render.Render(w, r, "room_list", map[string]interface{}{
-		"request":  r,
-		"authUser": au,
-		"rooms":    rooms,
-		"joinable": joinable,
-		"users":    users,
-		"now":      time.Now().UTC(),
+		"isMember": isMember,
 	})
 }
 
 func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
-
-	au, _ := auth.GetAuthenticatedUser(r)
 
 	room, err := roomRepo.Load(hash)
 	check(err, w)
@@ -142,30 +117,9 @@ func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Render(w, r, "room_folder", map[string]interface{}{
-		"request":  r,
-		"authUser": au,
-		"room":     room,
-		"folder":   folder,
-	})
-}
-
-func roomMemberHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	hash := vars["hash"]
-
-	au, _ := auth.GetAuthenticatedUser(r)
-
-	room, err := roomRepo.Load(hash)
-	check(err, w)
-
-	members, err := roomRepo.ListMembers(room.Hash)
-	check(err, w)
-
-	render.Render(w, r, "room_members", map[string]interface{}{
-		"request":  r,
-		"authUser": au,
-		"room":     room,
-		"members":  members,
+		"request": r,
+		"room":    room,
+		"folder":  folder,
 	})
 }
 
@@ -174,8 +128,6 @@ func roomMemberHandler(w http.ResponseWriter, r *http.Request) {
 func messageHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
-
-	au, _ := auth.GetAuthenticatedUser(r)
 
 	message, err := messageRepo.Load(hash)
 	check(err, w)
@@ -187,11 +139,10 @@ func messageHandler(w http.ResponseWriter, r *http.Request) {
 	check(err, w)
 
 	render.Render(w, r, "message", map[string]interface{}{
-		"request":  r,
-		"authUser": au,
-		"message":  message,
-		"room":     room,
-		"user":     user,
+		"request": r,
+		"message": message,
+		"room":    room,
+		"user":    user,
 	})
 }
 
@@ -250,10 +201,10 @@ func main() {
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(roomHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/edit", auth.LoginRequired(rooms.EditHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/folder", auth.LoginRequired(roomFolderHandler))
-	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/members", auth.LoginRequired(roomMemberHandler))
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/members", auth.LoginRequired(rooms.MemberHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/join", auth.LoginRequired(rooms.JoinHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/leave", auth.LoginRequired(rooms.LeaveHandler))
-	r.HandleFunc("/r", auth.LoginRequired(roomsHandler))
+	r.HandleFunc("/r", auth.LoginRequired(rooms.ListHandler))
 
 	// Message
 	r.HandleFunc("/m/save", auth.LoginRequired(messages.SaveHandler))
@@ -264,7 +215,7 @@ func main() {
 	http.HandleFunc("/callback", dropbox.HandleDropboxCallback)
 
 	r.HandleFunc("/ws", spokes.SpokeHandler)
-	r.HandleFunc("/", auth.LoginRequired(roomsHandler))
+	r.HandleFunc("/", auth.LoginRequired(rooms.ListHandler))
 
 	http.Handle("/", r)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

@@ -91,7 +91,7 @@ Message.html = function(message) {
   } else {
     var html = $(''+
       '<div class="ui-message" id="'+message.hash+'">'+
-        '<p><span class="ui-message-user">'+message.user.name+':</span> '+text+'</p>'+
+        '<p><span class="ui-message-user">'+message.user+':</span> '+text+'</p>'+
       '</div>');
   }
 

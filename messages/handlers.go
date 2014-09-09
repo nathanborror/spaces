@@ -6,11 +6,9 @@ import (
 	"github.com/nathanborror/gommon/auth"
 	"github.com/nathanborror/gommon/tokens"
 	"github.com/nathanborror/spaces/dropbox"
-	"github.com/nathanborror/spaces/rooms"
 )
 
 var repo = MessageSQLRepository("db.sqlite3")
-var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
 var tokenRepo = tokens.TokenSQLRepository("db.sqlite3")
 var userRepo = auth.AuthSQLRepository("db.sqlite3")
 

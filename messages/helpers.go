@@ -7,7 +7,11 @@ import (
 	"log"
 	"regexp"
 	"time"
+
+	"github.com/nathanborror/spaces/rooms"
 )
+
+var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
 
 // GenerateMessageHash returns a hash
 func GenerateMessageHash(s string) (hash string) {

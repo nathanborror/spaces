@@ -33,15 +33,6 @@ type MessageAction struct {
 	Raw      string `json:"raw"`
 }
 
-// GetUser returns the actual User instance
-func (m Message) GetUser() *auth.User {
-	u, err := authRepo.Load(m.User)
-	if err != nil {
-		return nil
-	}
-	return u
-}
-
 // GetActions returns actions (e.g. stickers, joins, etc.)
 func (m Message) GetActions() []*MessageAction {
 	commands := FindCommands(m.Text)
@@ -57,9 +48,8 @@ func (m Message) GetActions() []*MessageAction {
 func (m Message) MarshalPrepare() interface{} {
 	return struct {
 		Message
-		User    *auth.User       `json:"user"`
 		Actions []*MessageAction `json:"actions"`
-	}{m, m.GetUser(), m.GetActions()}
+	}{m, m.GetActions()}
 }
 
 // MarshalPrepare prepares a list of messages

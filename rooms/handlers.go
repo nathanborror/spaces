@@ -128,3 +128,38 @@ func JoinHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/r/"+room.Hash, 302)
 }
+
+// MemberHandler returns memebers for a room
+func MemberHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	room, err := repo.Load(hash)
+	check(err, w)
+
+	members, err := repo.ListMembers(room.Hash)
+	check(err, w)
+
+	render.Render(w, r, "room_members", map[string]interface{}{
+		"request": r,
+		"room":    room,
+		"members": members,
+	})
+}
+
+// ListHandler returns all available rooms
+func ListHandler(w http.ResponseWriter, r *http.Request) {
+	au, _ := auth.GetAuthenticatedUserHash(r)
+
+	rooms, err := roomMemberRepo.List(au, 20)
+	check(err, w)
+
+	joinable, err := roomMemberRepo.ListJoinable(au, 20)
+	check(err, w)
+
+	render.Render(w, r, "room_list", map[string]interface{}{
+		"request":  r,
+		"rooms":    rooms,
+		"joinable": joinable,
+	})
+}
