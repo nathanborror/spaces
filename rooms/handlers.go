@@ -1,17 +1,21 @@
 package rooms
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/gorilla/sessions"
 	"github.com/nathanborror/gommon/auth"
 	"github.com/nathanborror/gommon/render"
+	"github.com/nathanborror/spaces/dropbox"
 )
 
 var repo = RoomSQLRepository("db.sqlite3")
 var roomMemberRepo = RoomMemberSQLRepository("db.sqlite3")
 var userRepo = auth.AuthSQLRepository("db.sqlite3")
+var cookieStore = sessions.NewCookieStore([]byte("something-very-very-secret"))
 
 func check(err error, w http.ResponseWriter) {
 	if err != nil {
@@ -69,7 +73,7 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 	room, err := repo.Load(hash)
 	check(err, w)
 
-	members, err := repo.ListMembers(room.Hash)
+	members, err := roomMemberRepo.ListMembers(room.Hash)
 	check(err, w)
 
 	render.Render(w, r, "room_form", map[string]interface{}{
@@ -137,7 +141,7 @@ func MemberHandler(w http.ResponseWriter, r *http.Request) {
 	room, err := repo.Load(hash)
 	check(err, w)
 
-	members, err := repo.ListMembers(room.Hash)
+	members, err := roomMemberRepo.ListMembers(room.Hash)
 	check(err, w)
 
 	render.Render(w, r, "room_members", map[string]interface{}{
@@ -151,15 +155,48 @@ func MemberHandler(w http.ResponseWriter, r *http.Request) {
 func ListHandler(w http.ResponseWriter, r *http.Request) {
 	au, _ := auth.GetAuthenticatedUserHash(r)
 
-	rooms, err := roomMemberRepo.List(au, 20)
+	rooms, err := roomMemberRepo.ListRoomsForUser(au, 20)
 	check(err, w)
 
-	joinable, err := roomMemberRepo.ListJoinable(au, 20)
+	joinable, err := roomMemberRepo.ListJoinableRoomsForUser(au, 20)
 	check(err, w)
 
 	render.Render(w, r, "room_list", map[string]interface{}{
 		"request":  r,
 		"rooms":    rooms,
 		"joinable": joinable,
+	})
+}
+
+// FolderHandler returns a list of resources pertaining to the room
+func FolderHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	room, err := repo.Load(hash)
+	check(err, w)
+
+	var folder dropbox.Entry
+
+	if room.Folder != "" {
+		session, _ := cookieStore.Get(r, "dropbox")
+		token := fmt.Sprintf("%v", session.Values["token"])
+		if token == "<nil>" { // FIXME: This could be more presentable
+			http.Redirect(w, r, "/dropbox", 302)
+		}
+
+		url := fmt.Sprintf("https://api.dropbox.com/1/metadata/auto/%s", room.Folder)
+		response, err := dropbox.Request("GET", url, token)
+		if err != nil {
+			panic(err)
+		}
+
+		dropbox.DecodeResponse(response, &folder)
+	}
+
+	render.Render(w, r, "room_folder", map[string]interface{}{
+		"request": r,
+		"room":    room,
+		"folder":  folder,
 	})
 }

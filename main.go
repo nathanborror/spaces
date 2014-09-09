@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -33,24 +32,9 @@ func ext(name string) string {
 	return ""
 }
 
-func memberOf(args ...interface{}) bool {
-	if len(args) == 2 {
-		user := args[1].(string)
-		room := args[0].(string)
-
-		_, err := roomMemberRepo.Load(room, user)
-		if err != nil {
-			return false
-		}
-		return true
-	}
-	return false
-}
-
 func init() {
 	_ = render.RegisterTemplateFunction("markdown", markdown.Markdown)
 	_ = render.RegisterTemplateFunction("ext", ext)
-	_ = render.RegisterTemplateFunction("memberOf", memberOf)
 
 	cookieStore.Options = &sessions.Options{
 		Domain:   "localhost",
@@ -67,7 +51,7 @@ func check(err error, w http.ResponseWriter) {
 	}
 }
 
-// Room Handlers
+// Rooms
 
 func roomHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -88,61 +72,6 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 		"messages": messages,
 		"room":     room,
 		"isMember": isMember,
-	})
-}
-
-func roomFolderHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	hash := vars["hash"]
-
-	room, err := roomRepo.Load(hash)
-	check(err, w)
-
-	var folder dropbox.Entry
-
-	if room.Folder != "" {
-		session, _ := cookieStore.Get(r, "dropbox")
-		token := fmt.Sprintf("%v", session.Values["token"])
-		if token == "<nil>" { // HACK
-			http.Redirect(w, r, "/dropbox", 302)
-		}
-
-		url := fmt.Sprintf("https://api.dropbox.com/1/metadata/auto/%s", room.Folder)
-		response, err := dropbox.Request("GET", url, token)
-		if err != nil {
-			panic(err)
-		}
-
-		dropbox.DecodeResponse(response, &folder)
-	}
-
-	render.Render(w, r, "room_folder", map[string]interface{}{
-		"request": r,
-		"room":    room,
-		"folder":  folder,
-	})
-}
-
-// Message Handlers
-
-func messageHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	hash := vars["hash"]
-
-	message, err := messageRepo.Load(hash)
-	check(err, w)
-
-	room, err := roomRepo.Load(message.Room)
-	check(err, w)
-
-	user, err := authRepo.Load(message.User)
-	check(err, w)
-
-	render.Render(w, r, "message", map[string]interface{}{
-		"request": r,
-		"message": message,
-		"room":    room,
-		"user":    user,
 	})
 }
 
@@ -200,7 +129,7 @@ func main() {
 	r.HandleFunc("/r/save", auth.LoginRequired(rooms.SaveHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(roomHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/edit", auth.LoginRequired(rooms.EditHandler))
-	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/folder", auth.LoginRequired(roomFolderHandler))
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/folder", auth.LoginRequired(rooms.FolderHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/members", auth.LoginRequired(rooms.MemberHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/join", auth.LoginRequired(rooms.JoinHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/leave", auth.LoginRequired(rooms.LeaveHandler))
@@ -208,7 +137,7 @@ func main() {
 
 	// Message
 	r.HandleFunc("/m/save", auth.LoginRequired(messages.SaveHandler))
-	r.HandleFunc("/m/{hash:[a-zA-Z0-9-]+}", messageHandler)
+	r.HandleFunc("/m/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(messages.MessageHandler))
 
 	// Dropbox
 	http.HandleFunc("/dropbox", dropbox.HandleDropboxAuth)

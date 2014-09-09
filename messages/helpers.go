@@ -7,11 +7,7 @@ import (
 	"log"
 	"regexp"
 	"time"
-
-	"github.com/nathanborror/spaces/rooms"
 )
-
-var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
 
 // GenerateMessageHash returns a hash
 func GenerateMessageHash(s string) (hash string) {
@@ -55,7 +51,7 @@ func FindCommands(text string) []*MessageAction {
 
 // PushMembers sends APNS push notifications to the members of a room
 func PushMembers(room string, text string) {
-	members, err := roomRepo.ListMembers(room)
+	members, err := roomMemberRepo.ListMembers(room)
 	if err != nil {
 		log.Println("[Push]: ", err)
 	}
