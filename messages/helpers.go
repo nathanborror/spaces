@@ -65,5 +65,5 @@ func PushMembers(room string, text string) {
 		users = append(users, m.Hash)
 	}
 
-	tokenRepo.Push(users, text, "SpacesCert.pem", "SpacesKeyNoEnc.pem")
+	tokenRepo.Push(users, text, "SpacesProdCert.pem", "SpacesProdKeyNoEnc.pem")
 }
