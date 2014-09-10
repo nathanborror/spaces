@@ -60,6 +60,6 @@ func (r *sqlMessageRepository) Delete(hash string) error {
 
 func (r *sqlMessageRepository) List(room string, limit int) (MessageList, error) {
 	obj := MessageList{}
-	err := r.dbmap.Select(&obj, "SELECT * FROM message WHERE room = ? ORDER BY created ASC LIMIT ?", room, limit)
+	err := r.dbmap.Select(&obj, "SELECT * FROM (SELECT * FROM message WHERE room = ? ORDER BY created DESC LIMIT ?) ORDER BY created ASC", room, limit)
 	return obj, err
 }
