@@ -63,6 +63,17 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	room, err := roomRepo.Load(hash)
 	check(err, w)
 
+	// If this is a private one-on-one room check whether the logged
+	// in user is part of that room. If not, then they shouldn't be
+	// able to view this room.
+	if room.Kind == rooms.OneOnOne {
+		_, err := roomMemberRepo.Load(room.Hash, userHash)
+		if err != nil {
+			render.Redirect(w, r, "/")
+			return
+		}
+	}
+
 	messages, err := messageRepo.List(hash, 20)
 	check(err, w)
 
