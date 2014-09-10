@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
@@ -72,8 +73,8 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 
 	render.Render(w, r, "room", map[string]interface{}{
 		"request":  r,
-		"messages": messages,
 		"room":     room,
+		"messages": messages,
 		"members":  members,
 		"isMember": isMember,
 	})
@@ -81,36 +82,28 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 
 // Users
 
-func usersHandler(w http.ResponseWriter, r *http.Request) {
-	au, _ := auth.GetAuthenticatedUser(r)
-
-	users, err := authRepo.List(100)
-	check(err, w)
-
-	render.Render(w, r, "user_list", map[string]interface{}{
-		"request":  r,
-		"authUser": au,
-		"users":    users,
-	})
-}
-
-func userHandler(w http.ResponseWriter, r *http.Request) {
+func oneOnOneHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
 
-	au, _ := auth.GetAuthenticatedUser(r)
-
-	user, err := authRepo.Load(hash)
+	user1, _ := auth.GetAuthenticatedUser(r)
+	user2, err := authRepo.Load(hash)
 	check(err, w)
 
-	// TODO:
-	// Create a OneOnOne thread with this person if it doesn't already exist
+	// Create a one-on-one room between the logged in user and the clicked on
+	// user if the room doesn't already exist.
+	room, err := roomRepo.LoadOneOnOne(user1.Hash, user2.Hash)
+	if err != nil {
+		roomHash := rooms.GenerateOneOnOneHash(user1.Hash, user2.Hash)
+		room = &rooms.Room{Hash: roomHash, Name: roomHash, Kind: rooms.OneOnOne, Folder: "", Created: time.Now()}
+		err = roomRepo.Save(room)
+		check(err, w)
 
-	render.Render(w, r, "user", map[string]interface{}{
-		"request":  r,
-		"authUser": au,
-		"user":     user,
-	})
+		rooms.JoinRoom(roomHash, user1.Hash)
+		rooms.JoinRoom(roomHash, user2.Hash)
+	}
+
+	render.Redirect(w, r, "/r/"+room.Hash)
 }
 
 var r = mux.NewRouter()
@@ -122,8 +115,7 @@ func main() {
 	r.HandleFunc("/login", auth.LoginHandler)
 	r.HandleFunc("/logout", auth.LogoutHandler)
 	r.HandleFunc("/register", auth.RegisterHandler)
-	r.HandleFunc("/u", auth.LoginRequired(usersHandler))
-	r.HandleFunc("/u/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(userHandler))
+	r.HandleFunc("/u/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(oneOnOneHandler))
 
 	// Tokens
 	r.HandleFunc("/t/save", auth.LoginRequired(tokens.SaveHandler))

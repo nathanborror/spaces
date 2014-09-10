@@ -125,9 +125,7 @@ func JoinHandler(w http.ResponseWriter, r *http.Request) {
 	room, err := repo.Load(hash)
 	check(err, w)
 
-	hash = GenerateRoomMemberHash(room.Hash, user.Hash)
-	rm := &RoomMember{Hash: hash, User: user.Hash, Room: room.Hash}
-	err = roomMemberRepo.Save(rm)
+	err = JoinRoom(room.Hash, user.Hash)
 	check(err, w)
 
 	http.Redirect(w, r, "/r/"+room.Hash, 302)

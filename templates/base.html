@@ -1,5 +1,5 @@
 {{define "title"}}
-  <title>{{.}}</title>
+  <title>{{if .Kind|eq "oneonone"}}Private{{else}}{{.}}{{end}}</title>
 {{end}}
 
 {{define "header"}}

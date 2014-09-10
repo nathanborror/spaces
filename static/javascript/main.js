@@ -1,5 +1,6 @@
 var handleMessage = function(data) {
   MessageManager.update(data);
+  console.log("[WebSocket]: Received message");
 };
 
 var MessageManager = {};
@@ -116,7 +117,7 @@ Message.save = function(data, complete) {
       if (complete) {
         complete(data);
       }
-      window.SOCKET.request('/r/'+data.room.hash);
+      window.SOCKET.request(window.location.pathname);
     }.bind(this),
     error: function(xhr, status, error) {
       alert('There was '+status+' when trying to send this message. Please contact nathan@dropbox.com.');

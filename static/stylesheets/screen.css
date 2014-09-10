@@ -11,9 +11,9 @@ header h1 { font-size: 14px; color: rgba(255,255,255,1); font-weight: 500; }
 header h1 a { color: rgba(255,255,255,1); }
 header h1 a:hover { text-decoration: none; }
 header:after, article:after, footer:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
-header .ui-folder { display: block; position: absolute; top: 2px; right: 48px; width: 44px; height: 44px; background: url(../images/NavItemSharedFolder@2x.png) no-repeat; background-size: 44px; color: #fff; text-indent: -1000px; overflow: hidden; }
+header .ui-folder { display: block; position: absolute; top: 2px; right: 2px; width: 44px; height: 44px; background: url(../images/NavItemSharedFolder@2x.png) no-repeat; background-size: 44px; color: #fff; text-indent: -1000px; overflow: hidden; }
 header .ui-folder:hover { text-decoration: none; }
-header .ui-members { display: block; position: absolute; top: 2px; right: 2px; width: 44px; height: 44px; background: url(../images/NavItemMembers@2x.png) no-repeat; background-size: 44px; color: #fff; text-indent: -1000px; overflow: hidden; }
+header .ui-members { display: block; position: absolute; top: 2px; right: 48px; width: 44px; height: 44px; background: url(../images/NavItemMembers@2x.png) no-repeat; background-size: 44px; color: #fff; text-indent: -1000px; overflow: hidden; }
 header .ui-members:hover { text-decoration: none; }
 header .ui-join { position: absolute; top: 6px; right: 160px; padding: 8px 24px; background: #fff; color: rgba(74,143,227,1); border-radius: 4px; }
 header .ui-join:hover { text-decoration: none; }

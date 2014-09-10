@@ -65,6 +65,16 @@ func (r *sqlRoomRepository) List(limit int) ([]*Room, error) {
 	return obj, err
 }
 
+func (r *sqlRoomRepository) LoadOneOnOne(user1 string, user2 string) (*Room, error) {
+	hash := GenerateOneOnOneHash(user1, user2)
+	obj := []*Room{}
+	err := r.dbmap.Select(&obj, "SELECT * FROM room WHERE hash = ?", hash)
+	if len(obj) != 1 {
+		return nil, fmt.Errorf("expected 1 object, got %d", len(obj))
+	}
+	return obj[0], err
+}
+
 // RoomMember
 
 type sqlRoomMemberRepository struct {

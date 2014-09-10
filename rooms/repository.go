@@ -5,6 +5,7 @@ import "github.com/nathanborror/gommon/auth"
 // RoomRepository holds all the methods needed to save, delete, load and list User objects.
 type RoomRepository interface {
 	Load(hash string) (*Room, error)
+	LoadOneOnOne(user1 string, user2 string) (*Room, error)
 	Delete(hash string) error
 	Save(room *Room) error
 	List(limit int) ([]*Room, error)

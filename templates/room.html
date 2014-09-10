@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  {{template "title" .room.Name}}
+  {{template "title" .room}}
   {{template "header"}}
 </head>
 
 <body class="page-room">
 
 <header>
-  <h1><a href="/r/{{.room.Hash}}/edit">{{.room.Name}}</a></h1>
+  {{if .room.Kind|eq "oneonone"}}
+    <h1>Private</h1>
+  {{else}}
+    <h1><a href="/r/{{.room.Hash}}/edit">{{.room.Name}}</a></h1>
+  {{end}}
 
   {{if .isMember}}
   {{else}}
@@ -16,7 +20,10 @@
   {{end}}
 
   <a class="ui-folder" href="/r/{{.room.Hash}}/folder">Folder</a>
+  {{if .room.Kind|eq "oneonone"}}
+  {{else}}
   <a class="ui-members" href="/r/{{.room.Hash}}/members">Members</a>
+  {{end}}
 </header>
 
 <article>

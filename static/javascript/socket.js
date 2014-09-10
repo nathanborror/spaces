@@ -8,11 +8,11 @@ window.SOCKET = new WebSocket("ws://"+window.location.host+"/ws");
 window.SOCKET.subscriptions = {};
 
 window.SOCKET.onopen = function(e) {
-  console.log('Connection opened.');
+  console.log('[WebSocket]: Connection opened.');
 };
 
 window.SOCKET.onclose = function(e) {
-  console.log('Connection closed.');
+  console.log('[WebSocket]: Connection closed.');
 };
 
 window.SOCKET.onmessage = function(e) {
