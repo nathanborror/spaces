@@ -117,6 +117,16 @@ func oneOnOneHandler(w http.ResponseWriter, r *http.Request) {
 	render.Redirect(w, r, "/r/"+room.Hash)
 }
 
+func userListHandler(w http.ResponseWriter, r *http.Request) {
+	users, err := authRepo.List(100)
+	check(err, w)
+
+	render.Render(w, r, "user_list", map[string]interface{}{
+		"request":  r,
+		"users":  users,
+	})
+}
+
 var r = mux.NewRouter()
 
 func main() {
@@ -127,6 +137,7 @@ func main() {
 	r.HandleFunc("/logout", auth.LogoutHandler)
 	r.HandleFunc("/register", auth.RegisterHandler)
 	r.HandleFunc("/u/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(oneOnOneHandler))
+	r.HandleFunc("/u", auth.LoginRequired(userListHandler))
 
 	// Tokens
 	r.HandleFunc("/t/save", auth.LoginRequired(tokens.SaveHandler))
