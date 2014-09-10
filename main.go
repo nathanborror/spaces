@@ -14,6 +14,7 @@ import (
 	"github.com/nathanborror/gommon/render"
 	"github.com/nathanborror/gommon/spokes"
 	"github.com/nathanborror/gommon/tokens"
+	"github.com/nathanborror/spaces/boards"
 	"github.com/nathanborror/spaces/dropbox"
 	"github.com/nathanborror/spaces/messages"
 	"github.com/nathanborror/spaces/rooms"
@@ -122,8 +123,8 @@ func userListHandler(w http.ResponseWriter, r *http.Request) {
 	check(err, w)
 
 	render.Render(w, r, "user_list", map[string]interface{}{
-		"request":  r,
-		"users":  users,
+		"request": r,
+		"users":   users,
 	})
 }
 
@@ -141,6 +142,14 @@ func main() {
 
 	// Tokens
 	r.HandleFunc("/t/save", auth.LoginRequired(tokens.SaveHandler))
+
+	// Boards
+	r.HandleFunc("/b/create", auth.LoginRequired(boards.FormHandler))
+	r.HandleFunc("/b/save", auth.LoginRequired(boards.SaveHandler))
+	r.HandleFunc("/b/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(boards.BoardHandler))
+
+	// Paths
+	r.HandleFunc("/p/save", auth.LoginRequired(boards.SavePathHandler))
 
 	// Room
 	r.HandleFunc("/r/create", auth.LoginRequired(rooms.FormHandler))

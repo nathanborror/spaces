@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" "Create board"}}
+  {{template "header"}}
+</head>
+
+<body>
+
+<header>
+  <h1>Create Board</h1>
+</header>
+
+<article>
+  <form action="/b/save" method="post">
+    <fieldset>
+      <p><input type="text" name="name" value="" placeholder="Name" class="ux-focus"></p>
+      <button type="submit">Save</button>
+    </fieldset>
+  </form>
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>
