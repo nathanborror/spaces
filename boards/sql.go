@@ -59,6 +59,12 @@ func (r *sqlBoardRepository) List(limit int) ([]*Board, error) {
 	return obj, err
 }
 
+func (r *sqlBoardRepository) ListForRoom(room string) ([]*Board, error) {
+	obj := []*Board{}
+	err := r.dbmap.Select(&obj, "SELECT * FROM board WHERE room = ? ORDER BY created DESC", room)
+	return obj, err
+}
+
 // Paths
 
 type sqlPathRepository struct {
@@ -99,4 +105,14 @@ func (r *sqlPathRepository) List(board string) ([]*Path, error) {
 	obj := []*Path{}
 	err := r.dbmap.Select(&obj, "SELECT * FROM path WHERE board = ?", board)
 	return obj, err
+}
+
+func (r *sqlPathRepository) DeleteAll(board string) error {
+	_, err := r.dbmap.Exec("DELETE FROM path WHERE board=?", board)
+	return err
+}
+
+func (r *sqlPathRepository) Delete(hash string) error {
+	_, err := r.dbmap.Exec("DELETE FROM path WHERE hash=?", hash)
+	return err
 }

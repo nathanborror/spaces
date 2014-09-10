@@ -7,9 +7,11 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/nathanborror/gommon/auth"
 	"github.com/nathanborror/gommon/render"
+	"github.com/nathanborror/spaces/rooms"
 )
 
 var repo = BoardSQLRepository("db.sqlite3")
+var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
 var pathRepo = PathSQLRepository("db.sqlite3")
 var userRepo = auth.AuthSQLRepository("db.sqlite3")
 
@@ -23,6 +25,7 @@ func check(err error, w http.ResponseWriter) {
 // SaveHandler saves a board
 func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	hash := r.FormValue("hash")
+	room := r.FormValue("room")
 	name := r.FormValue("name")
 	created := time.Now()
 
@@ -35,7 +38,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 		created = board.Created
 	}
 
-	board = &Board{Hash: hash, Name: name, Created: created}
+	board = &Board{Hash: hash, Room: room, Name: name, Created: created}
 	err = repo.Save(board)
 	check(err, w)
 
@@ -59,8 +62,15 @@ func SavePathHandler(w http.ResponseWriter, r *http.Request) {
 
 // FormHandler presents a form for creating a board
 func FormHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["room"]
+
+	room, err := roomRepo.Load(hash)
+	check(err, w)
+
 	render.Render(w, r, "board_form", map[string]interface{}{
 		"request": r,
+		"room":    room,
 	})
 }
 
@@ -91,4 +101,26 @@ func BoardHandler(w http.ResponseWriter, r *http.Request) {
 		"board":   board,
 		"paths":   paths,
 	})
+}
+
+// DeletePathHandler removes a path from a board
+func DeletePathHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	err := pathRepo.Delete(hash)
+	check(err, w)
+
+	http.Redirect(w, r, "/", 302) // FIXME: Should redirect to the board
+}
+
+// DeleteAllPathHandler removes all paths from a board
+func DeleteAllPathHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	board := vars["board"]
+
+	err := pathRepo.DeleteAll(board)
+	check(err, w)
+
+	http.Redirect(w, r, "/", 302) // FIXME: Should redirect to the board
 }

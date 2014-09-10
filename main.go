@@ -144,8 +144,10 @@ func main() {
 	r.HandleFunc("/t/save", auth.LoginRequired(tokens.SaveHandler))
 
 	// Boards
-	r.HandleFunc("/b/create", auth.LoginRequired(boards.FormHandler))
 	r.HandleFunc("/b/save", auth.LoginRequired(boards.SaveHandler))
+	r.HandleFunc("/b/{room:[a-zA-Z0-9-]+}/create", auth.LoginRequired(boards.FormHandler))
+	r.HandleFunc("/b/{hash:[a-zA-Z0-9-]+}/delete", auth.LoginRequired(boards.DeletePathHandler))
+	r.HandleFunc("/b/{board:[a-zA-Z0-9-]+}/delete/all", auth.LoginRequired(boards.DeleteAllPathHandler))
 	r.HandleFunc("/b/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(boards.BoardHandler))
 
 	// Paths
