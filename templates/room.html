@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-  {{template "title" .room}}
+  {{if .room.Kind|eq "oneonone"}}
+    {{template "title" "Private"}}
+  {{else}}
+    {{template "title" .room.Name}}
+  {{end}}
+
   {{template "header"}}
 </head>
 
