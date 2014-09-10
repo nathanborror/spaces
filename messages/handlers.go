@@ -31,7 +31,6 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return
 	}
-	authRepo.Ping(au) // Ping user
 
 	hash := r.FormValue("hash")
 	room := r.FormValue("room")
