@@ -76,11 +76,18 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 
 // ListHandler returns all boards
 func ListHandler(w http.ResponseWriter, r *http.Request) {
-	boards, err := repo.List(20)
+	vars := mux.Vars(r)
+	hash := vars["hash"]
+
+	room, err := roomRepo.Load(hash)
+	check(err, w)
+
+	boards, err := repo.List(room.Hash)
 	check(err, w)
 
 	render.Render(w, r, "board_list", map[string]interface{}{
 		"request": r,
+		"room":  room,
 		"boards":  boards,
 	})
 }
@@ -103,8 +110,8 @@ func BoardHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// DeletePathHandler removes a path from a board
-func DeletePathHandler(w http.ResponseWriter, r *http.Request) {
+// UndoPathHandler removes a path from a board
+func UndoPathHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
 
@@ -115,12 +122,12 @@ func DeletePathHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteAllPathHandler removes all paths from a board
-func DeleteAllPathHandler(w http.ResponseWriter, r *http.Request) {
+func ClearHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	board := vars["board"]
+	hash := vars["hash"]
 
-	err := pathRepo.DeleteAll(board)
+	err := repo.Clear(hash)
 	check(err, w)
 
-	http.Redirect(w, r, "/", 302) // FIXME: Should redirect to the board
+	http.Redirect(w, r, "/b/"+hash, 302) // FIXME: Should redirect to the board
 }

@@ -53,16 +53,15 @@ func (r *sqlBoardRepository) Save(board *Board) error {
 	return err
 }
 
-func (r *sqlBoardRepository) List(limit int) ([]*Board, error) {
-	obj := []*Board{}
-	err := r.dbmap.Select(&obj, "SELECT * FROM board ORDER BY created DESC LIMIT ?", limit)
-	return obj, err
-}
-
-func (r *sqlBoardRepository) ListForRoom(room string) ([]*Board, error) {
+func (r *sqlBoardRepository) List(room string) ([]*Board, error) {
 	obj := []*Board{}
 	err := r.dbmap.Select(&obj, "SELECT * FROM board WHERE room = ? ORDER BY created DESC", room)
 	return obj, err
+}
+
+func (r *sqlBoardRepository) Clear(hash string) error {
+	_, err := r.dbmap.Exec("DELETE FROM path WHERE board=?", hash)
+	return err
 }
 
 // Paths
@@ -105,11 +104,6 @@ func (r *sqlPathRepository) List(board string) ([]*Path, error) {
 	obj := []*Path{}
 	err := r.dbmap.Select(&obj, "SELECT * FROM path WHERE board = ?", board)
 	return obj, err
-}
-
-func (r *sqlPathRepository) DeleteAll(board string) error {
-	_, err := r.dbmap.Exec("DELETE FROM path WHERE board=?", board)
-	return err
 }
 
 func (r *sqlPathRepository) Delete(hash string) error {

@@ -12,7 +12,13 @@
 </header>
 
 <article>
-
+  <div class="ui-list">
+    {{range .paths}}
+      <div class="ui-row">
+        <h4><a href="#">{{.Data}}</a></h4>
+      </div>
+    {{end}}
+  </div>
 </article>
 
 {{template "alert"}}

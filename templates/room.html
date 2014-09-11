@@ -24,6 +24,7 @@
     <a class="ui-join" href="/r/{{$.room.Hash}}/join">Join</a>
   {{end}}
 
+  <a class="ui-boards" href="/r/{{.room.Hash}}/boards">Boards</a>
   <a class="ui-folder" href="/r/{{.room.Hash}}/folder">Folder</a>
   {{if .room.Kind|eq "oneonone"}}
   {{else}}

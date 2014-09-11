@@ -146,12 +146,12 @@ func main() {
 	// Boards
 	r.HandleFunc("/b/save", auth.LoginRequired(boards.SaveHandler))
 	r.HandleFunc("/b/{room:[a-zA-Z0-9-]+}/create", auth.LoginRequired(boards.FormHandler))
-	r.HandleFunc("/b/{hash:[a-zA-Z0-9-]+}/delete", auth.LoginRequired(boards.DeletePathHandler))
-	r.HandleFunc("/b/{board:[a-zA-Z0-9-]+}/delete/all", auth.LoginRequired(boards.DeleteAllPathHandler))
+	r.HandleFunc("/b/{hash:[a-zA-Z0-9-]+}/clear", auth.LoginRequired(boards.ClearHandler))
 	r.HandleFunc("/b/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(boards.BoardHandler))
 
 	// Paths
 	r.HandleFunc("/p/save", auth.LoginRequired(boards.SavePathHandler))
+	r.HandleFunc("/p/{hash:[a-zA-Z0-9-]+}/undo", auth.LoginRequired(boards.UndoPathHandler))
 
 	// Room
 	r.HandleFunc("/r/create", auth.LoginRequired(rooms.FormHandler))
@@ -160,6 +160,7 @@ func main() {
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/edit", auth.LoginRequired(rooms.EditHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/folder", auth.LoginRequired(rooms.FolderHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/members", auth.LoginRequired(rooms.MemberHandler))
+	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/boards", auth.LoginRequired(boards.ListHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/join", auth.LoginRequired(rooms.JoinHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/leave", auth.LoginRequired(rooms.LeaveHandler))
 	r.HandleFunc("/r", auth.LoginRequired(rooms.ListHandler))
