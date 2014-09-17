@@ -63,9 +63,9 @@ Message.html = function(message, user) {
     text = text.slice(0,-1);
   }
 
-  var re = /(http|https):\/\/(.+).(png|jpg|gif)/;
+  var re = /^(http|https):\/\/(.+).(png|jpg|gif)$/;
   if (text.search(re) != -1) {
-    text = '<img class="ui-message-image" src="'+text+'">';
+    text = '<a href="'+text+'" target="_blank"><img class="ui-message-image" src="'+text+'"></a>';
   }
 
   // Actions
