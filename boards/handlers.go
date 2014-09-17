@@ -7,11 +7,9 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/nathanborror/gommon/auth"
 	"github.com/nathanborror/gommon/render"
-	"github.com/nathanborror/spaces/rooms"
 )
 
 var repo = BoardSQLRepository("db.sqlite3")
-var roomRepo = rooms.RoomSQLRepository("db.sqlite3")
 var pathRepo = PathSQLRepository("db.sqlite3")
 var userRepo = auth.AuthSQLRepository("db.sqlite3")
 
@@ -63,10 +61,7 @@ func SavePathHandler(w http.ResponseWriter, r *http.Request) {
 // FormHandler presents a form for creating a board
 func FormHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	hash := vars["room"]
-
-	room, err := roomRepo.Load(hash)
-	check(err, w)
+	room := vars["room"]
 
 	render.Render(w, r, "board_form", map[string]interface{}{
 		"request": r,
@@ -79,15 +74,11 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
 
-	room, err := roomRepo.Load(hash)
-	check(err, w)
-
-	boards, err := repo.List(room.Hash)
+	boards, err := repo.List(hash)
 	check(err, w)
 
 	render.Render(w, r, "board_list", map[string]interface{}{
 		"request": r,
-		"room":  room,
 		"boards":  boards,
 	})
 }
@@ -121,7 +112,7 @@ func UndoPathHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", 302) // FIXME: Should redirect to the board
 }
 
-// DeleteAllPathHandler removes all paths from a board
+// ClearHandler removes all paths from a board
 func ClearHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
