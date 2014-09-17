@@ -1,3 +1,27 @@
+
+var User = {};
+
+User.list = [];
+
+User.get = function(hash) {
+  return _.findWhere(User.list, {'hash': hash})
+}
+
+var UserManager = {};
+
+UserManager.init = function() {
+  $.ajax({
+    type: 'GET',
+    url: '/u',
+    success: function(data) {
+      User.list = data.users;
+    }.bind(this),
+    error: function(xhr, status, error) {
+      alert('There was '+status+' when trying to retrieve list of users.');
+    }
+  });
+}
+
 var handleMessage = function(data) {
   MessageManager.update(data);
   console.log("[WebSocket]: Received message");
@@ -24,7 +48,7 @@ MessageManager.update = function(data) {
   // Insert any hashes that don't exist.
   for (var i=0; i<diff.length; i++) {
     var message = _.findWhere(data.messages, {'hash': diff[i]});
-    var user = _.findWhere(window.USERS, {'hash': message.user})
+    var user = User.get(message.user)
 
     var html = Message.html(message, user);
     Message.insert(html, message_list);
@@ -153,16 +177,5 @@ $(function() {
 
   window.scrollTo(0, document.body.scrollHeight);
 
-  window.USERS = [];
-
-  $.ajax({
-    type: 'GET',
-    url: '/u',
-    success: function(data) {
-      window.USERS = data.users;
-    }.bind(this),
-    error: function(xhr, status, error) {
-      alert('There was '+status+' when trying to retrieve list of users.');
-    }
-  });
+  UserManager.init();
 });
