@@ -59,8 +59,8 @@ func (r *sqlRoomRepository) Delete(hash string) error {
 	return err
 }
 
-func (r *sqlRoomRepository) List(limit int) ([]*Room, error) {
-	obj := []*Room{}
+func (r *sqlRoomRepository) List(limit int) (RoomList, error) {
+	obj := RoomList{}
 	err := r.dbmap.Select(&obj, "SELECT * FROM room ORDER BY created DESC LIMIT ?", limit)
 	return obj, err
 }
@@ -126,14 +126,14 @@ func (r *sqlRoomMemberRepository) ListMembers(hash string) ([]*auth.User, error)
 	return obj, err
 }
 
-func (r *sqlRoomMemberRepository) ListRoomsForUser(user string, limit int) ([]*Room, error) {
-	rooms := []*Room{}
+func (r *sqlRoomMemberRepository) ListRoomsForUser(user string, limit int) (RoomList, error) {
+	rooms := RoomList{}
 	err := r.dbmap.Select(&rooms, "SELECT * FROM room WHERE hash IN (SELECT room FROM roommember WHERE user = ?) ORDER BY created DESC LIMIT ?", user, limit)
 	return rooms, err
 }
 
-func (r *sqlRoomMemberRepository) ListJoinableRoomsForUser(user string, limit int) ([]*Room, error) {
-	rooms := []*Room{}
+func (r *sqlRoomMemberRepository) ListJoinableRoomsForUser(user string, limit int) (RoomList, error) {
+	rooms := RoomList{}
 	err := r.dbmap.Select(&rooms, "SELECT * FROM room WHERE hash NOT IN (SELECT room FROM roommember WHERE user = ?) ORDER BY created DESC LIMIT ?", user, limit)
 	return rooms, err
 }
