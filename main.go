@@ -128,6 +128,22 @@ func userListHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func roomsHandler(w http.ResponseWriter, r *http.Request) {
+	au, _ := auth.GetAuthenticatedUserHash(r)
+
+	rs, err := roomMemberRepo.ListRoomsForUser(au, 20)
+	check(err, w)
+
+	joinable, err := roomMemberRepo.ListJoinableRoomsForUser(au, 20)
+	check(err, w)
+
+	render.Render(w, r, "room_list", map[string]interface{}{
+		"request":  r,
+		"rooms":    rs,
+		"joinable": joinable,
+	})
+}
+
 var r = mux.NewRouter()
 
 func main() {
@@ -163,7 +179,7 @@ func main() {
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/boards", auth.LoginRequired(boards.ListHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/join", auth.LoginRequired(rooms.JoinHandler))
 	r.HandleFunc("/r/{hash:[a-zA-Z0-9-]+}/leave", auth.LoginRequired(rooms.LeaveHandler))
-	r.HandleFunc("/r", auth.LoginRequired(rooms.ListHandler))
+	r.HandleFunc("/r", auth.LoginRequired(roomsHandler))
 
 	// Message
 	r.HandleFunc("/m/save", auth.LoginRequired(messages.SaveHandler))
@@ -174,7 +190,7 @@ func main() {
 	http.HandleFunc("/callback", dropbox.HandleDropboxCallback)
 
 	r.HandleFunc("/ws", spokes.SpokeHandler)
-	r.HandleFunc("/", auth.LoginRequired(rooms.ListHandler))
+	r.HandleFunc("/", auth.LoginRequired(roomsHandler))
 
 	http.Handle("/", r)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
