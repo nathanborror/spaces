@@ -65,7 +65,10 @@ Message.html = function(message, user) {
 
   var re = /^(http|https):\/\/(.+).(png|jpg|gif)$/;
   if (text.search(re) != -1) {
-    text = '<a href="'+text+'" target="_blank"><img class="ui-message-image" src="'+text+'"></a>';
+    text = ''+
+      '<div class="ui-message-images">'+
+        '<a class="ui-message-image" href="'+text+'" target="_blank" style="background-image: url('+text+');"></a>'+
+      '</div>';
   }
 
   // Actions
@@ -76,7 +79,7 @@ Message.html = function(message, user) {
     var action = message.actions[i];
     switch(action.type) {
       case 'sticker': {
-        stickers += '<img class="ui-message-sticker" src="/static/images/stickers/'+action.resource+'">';
+        stickers += '<span class="ui-message-sticker" style="background-image: url(/static/images/stickers/'+action.resource+');"></span>';
         break;
       }
       case 'join': {
