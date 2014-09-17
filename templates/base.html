@@ -11,6 +11,9 @@
   <script type="text/javascript" src="/static/javascript/vendor/jquery.js"></script>
   <script type="text/javascript" src="/static/javascript/vendor/jquery-ui.js"></script>
   <script type="text/javascript" src="/static/javascript/socket.js"></script>
+  <script type="text/javascript" src="/static/javascript/users.js"></script>
+  <script type="text/javascript" src="/static/javascript/messages.js"></script>
+  <script type="text/javascript" src="/static/javascript/rooms.js"></script>
   <script type="text/javascript" src="/static/javascript/main.js"></script>
 {{end}}
 
@@ -47,18 +50,6 @@
 
 {{define "alert"}}
   <div id="alert"></div>
-{{end}}
-
-{{define "renderRoom"}}
-  <div class="ui-row">
-    <h4><a href="/r/{{.Hash}}">{{.Name}}</a></h4>
-  </div>
-{{end}}
-
-{{define "renderMessage"}}
-  <div class="ui-message" id="{{.Hash}}" data-hash="{{.Hash}}" data-room="{{.Room}}" data-user="{{.User}}" data-text="{{.Text}}">
-    <p><span class="ui-message-user">{{.User}}</span>: {{.Text}}</p>
-  </div>
 {{end}}
 
 {{define "renderFile"}}

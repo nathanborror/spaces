@@ -12,26 +12,7 @@
 </header>
 
 <article>
-  <div class="ui-list">
-    {{range .rooms}}
-      {{template "renderRoom" .}}
-    {{end}}
-
-    {{if .joinable}}
-      <div class="ui-row-section">Joinable</div>
-
-      {{range .joinable}}
-        {{template "renderRoom" .}}
-      {{end}}
-    {{end}}
-
-    {{if .users}}
-      <div class="ui-row-section">People</div>
-      {{range .users}}
-        {{template "renderUser" .}}
-      {{end}}
-    {{end}}
-  </div>
+  <div class="ui-list"></div>
 </article>
 
 {{template "alert"}}
