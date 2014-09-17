@@ -185,9 +185,7 @@ func FolderHandler(w http.ResponseWriter, r *http.Request) {
 
 		url := fmt.Sprintf("https://api.dropbox.com/1/metadata/auto/%s", room.Folder)
 		response, err := dropbox.Request("GET", url, token)
-		if err != nil {
-			panic(err)
-		}
+		check(err, w)
 
 		dropbox.DecodeResponse(response, &folder)
 	}
