@@ -6,7 +6,7 @@
 body { margin: 48px 0; background: rgba(245,245,245,1); }
 body, textarea, input, button { font-family: "M1c"; font-weight: 400; font-size: 14px; line-height: 20px; }
 
-header { position: fixed; top: 0px; left: 0px; right: 0px; margin: 0; padding: 16px 16px 0 16px; height: 48px; background: rgba(74,143,227,1); border-bottom: 1px solid rgba(0,0,0,.15); z-index: 1; }
+header { position: fixed; top: 0px; left: 0px; right: 0px; margin: 0; padding: 16px 16px 0 16px; height: 48px; background: rgba(32,135,221,1); border-bottom: 1px solid rgba(0,0,0,.15); z-index: 1; }
 header h1 { font-size: 14px; color: rgba(255,255,255,1); font-weight: 500; }
 header h1 a { color: rgba(255,255,255,1); }
 header h1 a:hover { text-decoration: none; }
@@ -51,6 +51,11 @@ li { margin-bottom: 4px; line-height: 1.3; }
 
 .hidden { display: none; }
 
+/* Layout */
+.ui-master { position: fixed; top: 48px; left: 0px; bottom: 0px; width: 320px; background: #fff; border-right: 1px solid rgba(0,0,0,.2); }
+.ui-detail { position: absolute; top: 48px; left: 320px; right: 0px; z-index: 1; }
+.ui-detail-content { padding-bottom: 48px; }
+
 /* Buttons */
 .ui-button { display: inline-block; padding: 12px 32px; background-color: #fff; color: #777; border-radius: 4px;
   box-shadow: 0 1px 0 0 rgba(0,0,0,.1); }
@@ -71,15 +76,19 @@ li { margin-bottom: 4px; line-height: 1.3; }
 .ui-row:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
 .ui-row h4 a { display: block; padding: 12px 16px; color: rgba(0,0,0,1); }
 .ui-row h4 a:hover { text-decoration: none; }
-.ui-row .ui-subtitle { display: block; font-size: 12px; color: rgba(0,0,0,.5); font-weight: 300; }
+.ui-row .ui-subtitle { display: block; font-size: 12px; color: rgba(0,0,0,.5); font-weight: 300; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 .ui-row-section { padding: 4px 16px; text-transform: uppercase; font-size: 12px; color: rgba(255,255,255,1); background-color: rgba(74,143,227,.4); font-weight: 500; }
 .ui-row-add h4 a { color: rgba(74,143,227,1); }
 
+.ui-row-selected { background: rgba(130,221,151,1); }
+.ui-row-selected h4 a { color: #fff; }
+.ui-row-selected .ui-subtitle { color: #fff; }
+
 /* Message */
-.ui-message { position: relative; padding: 8px 16px; border-bottom: 1px solid rgba(0,0,0,.1); }
+.ui-message { position: relative; padding: 8px 16px; border-bottom: 1px solid rgba(0,0,0,.1); background: #fff; }
 .ui-message:last-child { border-bottom: none; }
 .ui-message p { margin: 0; max-width: 960px; }
-.ui-message-user { color: rgba(138,166,89,1); }
+.ui-message-user { color: rgba(32,135,221,1); }
 .ui-message-images { display: block; margin-top: 8px; }
 .ui-message-image { display: inline-block; width: 256px; height: 256px; background-color: #ddd; background-size: 256px; background-repeat: no-repeat; background-position: 50% 50%; border-radius: 6px; }
 .ui-message-stickers { display: block; }
@@ -92,9 +101,10 @@ li { margin-bottom: 4px; line-height: 1.3; }
 .page-room footer { display: none; }
 
 /* Room Form */
-.ui-room-form { position: fixed; bottom: 0px; left: 0px; right: 0px; margin: 0; height: 48px; background: rgba(255,255,255,1);
+.ui-room-form { position: fixed; display: none; bottom: 0px; left: 320px; right: 0px; margin: 0; height: 48px; background: rgba(255,255,255,1);
   border-top: 1px solid rgba(0,0,0,.15); }
 .ui-room-form input { box-shadow: none; background: none; }
+body.room-active .ui-room-form { display: block; }
 
 .ui-icon { display: block; float: left; margin: 4px 8px 0 0; width: 32px; height: 32px; background: url(../images/Sprite@2x.png) 0 0 no-repeat; background-size: 32px auto; background-position: 0 0; }
 .ui-icon-folder { background-position: 0 -32px; }
@@ -134,4 +144,8 @@ li { margin-bottom: 4px; line-height: 1.3; }
   fieldset { margin: 0 auto 32px auto; padding: 16px; }
   .ui-watermark { margin: 0 auto; width: 96px; height: 96px; background-size: 96px; }
   .ui-auth { margin-top: 32px; }
+
+  .ui-master { right: 0px; width: auto; border-right: none; }
+  .ui-detail { left: 0; right: 0px; }
+  .ui-room-form { left: 0; }
 }

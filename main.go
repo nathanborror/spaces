@@ -137,7 +137,7 @@ func roomsHandler(w http.ResponseWriter, r *http.Request) {
 	joinable, err := roomMemberRepo.ListJoinableRoomsForUser(au, 20)
 	check(err, w)
 
-	render.Render(w, r, "room_list", map[string]interface{}{
+	render.Render(w, r, "home", map[string]interface{}{
 		"request":  r,
 		"rooms":    rs,
 		"joinable": joinable,

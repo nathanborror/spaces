@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  {{template "title" "Spaces"}}
+  {{template "header"}}
+</head>
+
+<body>
+
+<header>
+  <h1>Spaces</h1>
+</header>
+
+<article>
+  <div class="ui-master"></div>
+  <div class="ui-detail">
+    <div class="ui-detail-content"></div>
+    <form action="/m/save" method="post" class="ui-room-form" autocomplete="off">
+      <p><input type="text" name="text" value="" placeholder="Say something..." class="ux-focus" autocomplete="off"></p>
+      <input type="hidden" name="room" value="">
+      <button type="submit" class="hidden">Post</button>
+    </form>
+  </div>
+</article>
+
+{{template "alert"}}
+{{template "footer" .}}
+
+</body>
+</html>

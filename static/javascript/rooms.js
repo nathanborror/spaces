@@ -9,10 +9,15 @@
 var RoomManager = {};
 var Room = {};
 
+RoomManager.init = function() {
+  var body = $('body');
+  body.on('click', '.ui-row-room a', Room.handleClick);
+};
+
 // Update checks all the items on screen and adds any missing from the
 // current dataset.
 RoomManager.update = function(data) {
-  var room_list = $('.ui-list');
+  var room_list = $('.ui-master');
   var current = _.map(room_list.find('> .ui-row'), function(obj) {
     return obj.id;
   });
@@ -47,7 +52,7 @@ Room.html = function(room) {
   }
 
   var html = $(''+
-    '<div class="ui-row" id="'+room.hash+'">'+
+    '<div class="ui-row ui-row-room" id="'+room.hash+'">'+
       '<h4>'+
         '<a href="/r/'+room.hash+'">'+
           '<span class="ui-title">'+room.name+'</span>'+
@@ -62,4 +67,26 @@ Room.html = function(room) {
   });
 
   return html;
+};
+
+Room.handleClick = function(e) {
+  e.preventDefault();
+
+  var body = $('body');
+  var room = $(this).parents('.ui-row');
+
+  body.addClass('room-active');
+
+  $('.ui-row-selected').removeClass('ui-row-selected');
+  room.addClass('ui-row-selected');
+
+  // Set room input
+  $('.ui-room-form input[name="room"]').val(room.data('hash'))
+
+  // Remove previous content
+  $('.ui-detail-content').html('');
+
+  // Subscribe and request content for room
+  window.SOCKET.subscribe(this.pathname, handleMessage);
+  window.SOCKET.request(this.pathname);
 };

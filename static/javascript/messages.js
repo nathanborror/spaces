@@ -12,7 +12,7 @@ var Message = {};
 // UpdateItems checks all the items on screen and adds any missing from the
 // current dataset.
 MessageManager.update = function(data) {
-  var message_list = $('.ui-list');
+  var message_list = $('.ui-detail-content');
   var current = _.map(message_list.find('> .ui-message'), function(obj) {
     return obj.id;
   });
@@ -133,7 +133,7 @@ Message.save = function(data, complete) {
       if (complete) {
         complete(data);
       }
-      window.SOCKET.request(window.location.pathname);
+      window.SOCKET.request('/r/'+data.message.room);
     }.bind(this),
     error: function(xhr, status, error) {
       alert('There was '+status+' when trying to send this message. Please contact nathan@dropbox.com.');
