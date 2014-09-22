@@ -120,6 +120,12 @@ func (r *sqlRoomMemberRepository) Save(rm *RoomMember) error {
 	return err
 }
 
+func (r *sqlRoomMemberRepository) List(hash string) ([]*RoomMember, error) {
+	obj := []*RoomMember{}
+	err := r.dbmap.Select(&obj, "SELECT * from roommember WHERE room = ?", hash)
+	return obj, err
+}
+
 func (r *sqlRoomMemberRepository) ListMembers(hash string) ([]*auth.User, error) {
 	obj := []*auth.User{}
 	err := r.dbmap.Select(&obj, "SELECT * FROM user WHERE hash IN (SELECT user from roommember WHERE room = ?) ORDER BY created DESC", hash)

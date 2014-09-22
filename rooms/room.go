@@ -47,12 +47,21 @@ func (r Room) GetRecent() *messages.Message {
 	return ml[0]
 }
 
+func (r Room) GetMembers() []*RoomMember {
+	m, err := roomMemberRepo.List(r.Hash)
+	if err != nil {
+		return nil
+	}
+	return m
+}
+
 // MarshalPrepare output
 func (r Room) MarshalPrepare() interface{} {
 	return struct {
 		Room
 		Recent *messages.Message `json:"recent"`
-	}{r, r.GetRecent()}
+		Members []*RoomMember `json:"members"`
+	}{r, r.GetRecent(), r.GetMembers()}
 }
 
 // MarshalPrepare prepares a list of rooms

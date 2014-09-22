@@ -15,6 +15,7 @@ type RoomRepository interface {
 type RoomMemberRepository interface {
 	Load(room string, user string) (*RoomMember, error)
 	Save(roomMember *RoomMember) error
+	List(hash string) ([]*RoomMember, error)
 	ListMembers(hash string) ([]*auth.User, error)
 	ListRoomsForUser(user string, limit int) (RoomList, error)
 	ListJoinableRoomsForUser(user string, limit int) (RoomList, error)
