@@ -87,6 +87,7 @@ Room.handleClick = function(e) {
   $('.ui-detail-content').html('');
 
   // Subscribe and request content for room
+  window.SOCKET.unsubscribeAll();
   window.SOCKET.subscribe(this.pathname, handleMessage);
   window.SOCKET.request(this.pathname);
 };
