@@ -42,10 +42,6 @@ window.SOCKET.unsubscribe = function(channel) {
   window.SOCKET.subscriptions[channel].pop();
 }
 
-window.SOCKET.unsubscribeAll = function() {
-  window.SOCKET.subscriptions = {};
-}
-
 window.SOCKET.request = function(url) {
   var payload = JSON.stringify({'url': url, 'action': kActionRequest, 'port': kPort});
   window.SOCKET.send(payload);

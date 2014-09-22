@@ -14,6 +14,8 @@ var handleMessage = function(data) {
   console.log("[WebSocket]: Received message");
 };
 
+window.ACTIVE_ROOM;
+
 // HACK
 $(function() {
   var body = $('body');
@@ -31,8 +33,10 @@ $(function() {
 
   window.SOCKET.onopen = function(e) {
     $("#alert >").remove();
-    window.SOCKET.subscribe(window.location.pathname, handleMessage);
-    window.SOCKET.request(window.location.pathname);
+
+    // Always subscribe for the list of rooms
+    window.SOCKET.subscribe('/', handleMessage);
+    window.SOCKET.request('/');
   }
 
   window.scrollTo(0, document.body.scrollHeight);
