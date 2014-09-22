@@ -42,9 +42,6 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	// Check for any resources in message
 	go dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
 
-	// Push members
-	// go push.PushMembers(room, m.Text)
-
 	// Redirect to message (this is kind of a hack so we return the right JSON
 	// to the clients connected over websockets).
 	http.Redirect(w, r, "/m/"+hash, http.StatusFound)

@@ -17,6 +17,7 @@ import (
 	"github.com/nathanborror/spaces/boards"
 	"github.com/nathanborror/spaces/dropbox"
 	"github.com/nathanborror/spaces/messages"
+	"github.com/nathanborror/spaces/push"
 	"github.com/nathanborror/spaces/rooms"
 )
 
@@ -144,6 +145,36 @@ func roomsHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func messageSaveHandler(w http.ResponseWriter, r *http.Request) {
+	au, err := auth.GetAuthenticatedUser(r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return
+	}
+
+	hash := r.FormValue("hash")
+	room := r.FormValue("room")
+	text := r.FormValue("text")
+
+	if hash == "" {
+		hash = messages.GenerateMessageHash(text)
+	}
+
+	m := &messages.Message{Hash: hash, Room: room, User: au.Hash, Text: text}
+	err = messageRepo.Save(m)
+	check(err, w)
+
+	// Check for any resources in message
+	go dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
+
+	// Push members
+	go push.PushMembers(room, m.Text)
+
+	// Redirect to message (this is kind of a hack so we return the right JSON
+	// to the clients connected over websockets).
+	http.Redirect(w, r, "/m/"+hash, http.StatusFound)
+}
+
 var r = mux.NewRouter()
 
 func main() {
@@ -182,7 +213,7 @@ func main() {
 	r.HandleFunc("/r", auth.LoginRequired(roomsHandler))
 
 	// Message
-	r.HandleFunc("/m/save", auth.LoginRequired(messages.SaveHandler))
+	r.HandleFunc("/m/save", auth.LoginRequired(messageSaveHandler))
 	r.HandleFunc("/m/{hash:[a-zA-Z0-9-]+}", auth.LoginRequired(messages.MessageHandler))
 
 	// Dropbox
