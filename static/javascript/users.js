@@ -15,12 +15,13 @@ User.get = function(hash) {
 
 var UserManager = {};
 
-UserManager.init = function() {
+UserManager.init = function(callback) {
   $.ajax({
     type: 'GET',
     url: '/u',
     success: function(data) {
       User.list = data.users;
+      callback();
     }.bind(this),
     error: function(xhr, status, error) {
       alert('There was '+status+' when trying to retrieve list of users.');

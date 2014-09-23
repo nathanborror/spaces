@@ -9,9 +9,10 @@
 */
 
 var handleMessage = function(data) {
+  console.log("[WebSocket]: Received message");
+
   MessageManager.update(data);
   RoomManager.update(data);
-  console.log("[WebSocket]: Received message");
 };
 
 window.ACTIVE_ROOM;
@@ -23,9 +24,6 @@ $(function() {
   // Rooms
   body.on('submit', '.ui-room-form', MessageManager.submit);
 
-  // Input fields
-  $('.ux-focus').focus();
-
   // WebSocket
   window.SOCKET.onclose = function(e) {
     $("#alert").append("<p>Oops! You've been disconnected. <a href='javascript:location.reload();'>Reload</a> to fix this.</p>");
@@ -34,13 +32,16 @@ $(function() {
   window.SOCKET.onopen = function(e) {
     $("#alert >").remove();
 
-    // Always subscribe for the list of rooms
-    window.SOCKET.subscribe('/', handleMessage);
-    window.SOCKET.request('/');
+    UserManager.init(function() {
+      // Always subscribe for the list of rooms
+      window.SOCKET.subscribe('/', handleMessage);
+      window.SOCKET.request('/');
+
+      RoomManager.init();
+
+      // Input fields
+      $('.ux-focus').focus();
+    });
+
   }
-
-  window.scrollTo(0, document.body.scrollHeight);
-
-  UserManager.init();
-  RoomManager.init();
 });
