@@ -29,7 +29,7 @@ RoomManager.init = function() {
 // Update checks all the items on screen and adds any missing from the
 // current dataset.
 RoomManager.update = function(data) {
-  var room_list = $('.ui-master');
+  var room_list = $('.ui-master-content');
   var current = _.map(room_list.find('> .ui-row'), function(obj) {
     return obj.id;
   });

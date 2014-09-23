@@ -6,16 +6,19 @@
 body { margin: 48px 0; background: rgba(245,245,245,1); }
 body, textarea, input, button { font-family: "M1c"; font-weight: 400; font-size: 14px; line-height: 20px; }
 
-header { position: fixed; top: 0px; left: 0px; right: 0px; margin: 0; padding: 16px 16px 0 16px; height: 48px; background: rgba(32,135,221,1); border-bottom: 1px solid rgba(0,0,0,.15); z-index: 9; }
-header h1 { font-size: 14px; color: rgba(255,255,255,1); font-weight: 500; }
-header h1 a { color: rgba(255,255,255,1); }
+header { position: fixed; top: 0px; left: 0px; right: 320px; margin: 0; padding: 16px 16px 0 16px; height: 48px; background: rgba(250,250,250,.95); border-bottom: 1px solid rgba(0,0,0,.05); z-index: 9; }
+header h1 { font-size: 14px; color: rgba(0,0,0,.3); font-weight: 500; }
+header h1 a { color: rgba(0,0,0,.3); }
 header h1 a:hover { text-decoration: none; }
 header:after, article:after, footer:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
-header .ui-folder { display: none; position: absolute; top: 2px; right: 48px; width: 44px; height: 44px; background: url(../images/NavItemSharedFolder@2x.png) no-repeat; background-size: 44px; color: #fff; text-indent: -1000px; overflow: hidden; }
+
+header .ui-folder, header .ui-members, header .ui-boards {
+  display: none; position: absolute; top: 2px; width: 44px; height: 44px; background-size: 26px; text-indent: -1000px; overflow: hidden; background-position: 50% 50%; background-repeat: no-repeat; }
+header .ui-folder { right: 48px; background-image: url(../images/NavItemSharedFolder@2x.png); }
 header .ui-folder:hover { text-decoration: none; }
-header .ui-members { display: none; position: absolute; top: 2px; right: 96px; width: 44px; height: 44px; background: url(../images/NavItemMembers@2x.png) no-repeat; background-size: 44px; color: #fff; text-indent: -1000px; overflow: hidden; }
+header .ui-members { right: 96px; background-image: url(../images/NavItemMembers@2x.png); }
 header .ui-members:hover { text-decoration: none; }
-header .ui-boards { display: none; position: absolute; top: 2px; right: 2px; width: 44px; height: 44px; background: url(../images/NavItemBoard@2x.png) no-repeat; background-size: 44px; color: #fff; text-indent: -1000px; overflow: hidden; }
+header .ui-boards { right: 2px; background-image: url(../images/NavItemBoard@2x.png); }
 header .ui-boards:hover { text-decoration: none; }
 header .ui-join { position: absolute; top: 6px; right: 160px; padding: 8px 24px; background: #fff; color: rgba(74,143,227,1); border-radius: 4px; }
 header .ui-join:hover { text-decoration: none; }
@@ -57,7 +60,7 @@ li { margin-bottom: 4px; line-height: 1.3; }
 .hidden { display: none; }
 
 /* Layout */
-.ui-master { position: fixed; top: 48px; right: 0px; bottom: 0px; width: 320px; background: #fff; border-left: 1px solid rgba(0,0,0,.2); }
+.ui-master { position: fixed; top: 0; right: 0px; bottom: 0px; width: 320px; background: rgba(50,50,50,1); border-left: 1px solid rgba(0,0,0,.2); }
 .ui-detail { position: absolute; top: 48px; right: 320px; left: 0px; z-index: 1; }
 .ui-detail-content { padding-bottom: 48px; }
 
@@ -71,7 +74,7 @@ li { margin-bottom: 4px; line-height: 1.3; }
 .ui-auth { margin-top: 64px; }
 
 /* Alert */
-#alert { position: fixed; top: 0; left: 0; right: 0; z-index: 1; }
+#alert { position: fixed; top: 0; left: 0; right: 320px; z-index: 999; }
 #alert p { padding: 16px 8px 0 8px; height: 48px; background: rgba(246,155,129,1); color: #fff; font-size: 14px; font-weight: 500; text-align: center; }
 #alert a { color: #fff; text-decoration: underline; }
 
@@ -88,6 +91,12 @@ li { margin-bottom: 4px; line-height: 1.3; }
 .ui-row-selected { background: rgba(130,221,151,1); }
 .ui-row-selected h4 a { color: #fff; }
 .ui-row-selected .ui-subtitle { color: #fff; }
+
+.ui-master .ui-row { background: none; box-shadow: inset 0 -1px 0 0 rgba(255,255,255,.1);  }
+.ui-master .ui-row h4,
+.ui-master .ui-row h4 a { color: rgba(255,255,255,1); }
+.ui-master .ui-row .ui-subtitle { color: rgba(255,255,255,.5); }
+.ui-master .ui-row-selected { background: rgba(70,70,70,1); box-shadow: none; }
 
 /* Message */
 .ui-message { position: relative; padding: 8px 16px; border-bottom: 1px solid rgba(0,0,0,.1); background: #fff; }
@@ -110,6 +119,9 @@ li { margin-bottom: 4px; line-height: 1.3; }
   border-top: 1px solid rgba(0,0,0,.15); }
 .ui-room-form input { box-shadow: none; background: none; }
 body.room-active .ui-room-form { display: block; }
+
+.ui-room-create { position: fixed; right: 16px; bottom: 16px; padding: 8px 16px; background: rgba(255,255,255,.1); color: rgba(255,255,255,1); border-radius: 4px; }
+.ui-room-create:hover { text-decoration: none; }
 
 .ui-icon { display: block; float: left; margin: 4px 8px 0 0; width: 32px; height: 32px; background: url(../images/Sprite@2x.png) 0 0 no-repeat; background-size: 32px auto; background-position: 0 0; }
 .ui-icon-folder { background-position: 0 -32px; }
