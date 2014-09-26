@@ -115,6 +115,9 @@ Room.html = function(room) {
           '<span class="ui-subtitle">'+recent+'</span>'+
         '</a>'+
       '</h4>'+
+      '<a class="ui-boards" href="'+url+'/boards">Boards</a>'+
+      '<a class="ui-folder" href="'+url+'/folder">Folder</a>'+
+      '<a class="ui-members" href="'+url+'/members">Members</a>'+
     '</div>');
 
   html.data({

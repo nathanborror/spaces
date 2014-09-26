@@ -107,9 +107,11 @@ Message.html = function(message, user) {
         '<p>'+command+'</p>'+
       '</div>');
   } else {
+    text = text.replace(/@(\w+)/, '<a href="/u/$1" class="ui-mention"><span>@</span>$1</a>');
     var html = $(''+
       '<div class="ui-message" id="'+message.hash+'">'+
-        '<p><a href="/u/'+user.hash+'" class="ui-message-user">'+user.name+':</a> '+text+'</p>'+
+        '<a class="ui-message-profile" href="#"></a>'+
+        '<p><a href="/u/'+user.hash+'" class="ui-message-user">'+user.name+'</a> '+text+'</p>'+
       '</div>');
   }
 
