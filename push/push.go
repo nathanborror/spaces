@@ -19,7 +19,7 @@ func PushMembers(room string, text string) {
 
 	users := []string{}
 	for _, m := range members {
-		users = append(users, m.Hash)
+		users = append(users, m.Key)
 	}
 
 	tokenRepo.Push(users, text, "SpacesProdCert.pem", "SpacesProdKeyNoEnc.pem")

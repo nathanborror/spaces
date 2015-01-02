@@ -9,8 +9,8 @@ var User = {};
 
 User.list = [];
 
-User.get = function(hash) {
-  return _.findWhere(User.list, {'hash': hash})
+User.get = function(key) {
+  return _.findWhere(User.list, {'key': key})
 }
 
 var UserManager = {};

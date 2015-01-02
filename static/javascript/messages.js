@@ -111,7 +111,7 @@ Message.html = function(message, user) {
     var html = $(''+
       '<div class="ui-message" id="'+message.hash+'">'+
         '<a class="ui-message-profile" href="#"></a>'+
-        '<p><a href="/u/'+user.hash+'" class="ui-message-user">'+user.name+'</a> '+text+'</p>'+
+        '<p><a href="/u/'+user.key+'" class="ui-message-user">'+user.name+'</a> '+text+'</p>'+
       '</div>');
   }
 

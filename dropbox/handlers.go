@@ -12,16 +12,10 @@ import (
 	"strconv"
 
 	"github.com/gorilla/sessions"
+	"github.com/nathanborror/gommon/render"
 )
 
 var cookieStore = sessions.NewCookieStore([]byte("something-very-very-secret"))
-
-func check(err error, w http.ResponseWriter) {
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
 
 // HandleDropboxFilesPut handles a Dropbox file put request
 func HandleDropboxFilesPut(name string, text string, r *http.Request) {
@@ -94,7 +88,7 @@ func HandleDropboxCallback(w http.ResponseWriter, r *http.Request) {
 			"code":         {r.FormValue("code")},
 			"grant_type":   {"authorization_code"},
 		})
-	check(err, w)
+	render.Check(err, w)
 
 	var token Token
 	DecodeResponse(resp, &token)

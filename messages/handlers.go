@@ -5,19 +5,13 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/nathanborror/gommon/auth"
+	"github.com/nathanborror/gommon/crypto"
 	"github.com/nathanborror/gommon/render"
 	"github.com/nathanborror/spaces/dropbox"
 )
 
 var repo = MessageSQLRepository("db.sqlite3")
 var userRepo = auth.AuthSQLRepository("db.sqlite3")
-
-func check(err error, w http.ResponseWriter) {
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
 
 // SaveHandler saves a item
 func SaveHandler(w http.ResponseWriter, r *http.Request) {
@@ -32,12 +26,12 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	text := r.FormValue("text")
 
 	if hash == "" {
-		hash = GenerateMessageHash(text)
+		hash = crypto.UniqueHash(text)
 	}
 
-	m := &Message{Hash: hash, Room: room, User: au.Hash, Text: text}
+	m := &Message{Hash: hash, Room: room, User: au.Key, Text: text}
 	err = repo.Save(m)
-	check(err, w)
+	render.Check(err, w)
 
 	// Check for any resources in message
 	go dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
@@ -53,10 +47,10 @@ func MessageHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	message, err := repo.Load(hash)
-	check(err, w)
+	render.Check(err, w)
 
-	user, err := authRepo.Load(message.User)
-	check(err, w)
+	user, err := authRepo.Get(message.User)
+	render.Check(err, w)
 
 	render.Render(w, r, "message", map[string]interface{}{
 		"request": r,

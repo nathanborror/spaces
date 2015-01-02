@@ -1,20 +1,6 @@
 package messages
 
-import (
-	"crypto/md5"
-	"fmt"
-	"io"
-	"regexp"
-	"time"
-)
-
-// GenerateMessageHash returns a hash
-func GenerateMessageHash(s string) (hash string) {
-	time := time.Now().String()
-	hasher := md5.New()
-	io.WriteString(hasher, s+time)
-	return fmt.Sprintf("%x", hasher.Sum(nil))
-}
+import "regexp"
 
 // FindStickers returns a set of MessageActiosn with the type 'sticker'
 func FindStickers(text string) []*MessageAction {

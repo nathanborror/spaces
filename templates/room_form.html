@@ -19,8 +19,8 @@
       {{if .room}}{{else}}
       <ul>
         {{range .users}}
-          {{if $.user.Hash|ne .Hash}}
-            <li><label><input type="checkbox" name="members" value="{{.Hash}}"> {{.Name}}</label></li>
+          {{if $.user.Key|ne .Key}}
+            <li><label><input type="checkbox" name="members" value="{{.Key}}"> {{.Name}}</label></li>
           {{end}}
         {{end}}
       </ul>

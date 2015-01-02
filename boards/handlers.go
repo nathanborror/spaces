@@ -6,19 +6,13 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/nathanborror/gommon/auth"
+	"github.com/nathanborror/gommon/crypto"
 	"github.com/nathanborror/gommon/render"
 )
 
 var repo = BoardSQLRepository("db.sqlite3")
 var pathRepo = PathSQLRepository("db.sqlite3")
 var userRepo = auth.AuthSQLRepository("db.sqlite3")
-
-func check(err error, w http.ResponseWriter) {
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
 
 // SaveHandler saves a board
 func SaveHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +22,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	created := time.Now()
 
 	if hash == "" {
-		hash = GenerateHash()
+		hash = crypto.UniqueHash(name)
 	}
 
 	board, err := repo.Load(hash)
@@ -38,7 +32,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 
 	board = &Board{Hash: hash, Room: room, Name: name, Created: created}
 	err = repo.Save(board)
-	check(err, w)
+	render.Check(err, w)
 
 	http.Redirect(w, r, "/b/"+board.Hash, http.StatusFound)
 }
@@ -47,13 +41,13 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 func SavePathHandler(w http.ResponseWriter, r *http.Request) {
 	u, _ := auth.GetAuthenticatedUser(r)
 
-	hash := GenerateHash()
+	hash := crypto.UniqueHash("")
 	board := r.FormValue("board")
 	data := r.FormValue("data")
 
-	path := &Path{Hash: hash, Board: board, Data: data, User: u.Hash}
+	path := &Path{Hash: hash, Board: board, Data: data, User: u.Key}
 	err := pathRepo.Save(path)
-	check(err, w)
+	render.Check(err, w)
 
 	http.Redirect(w, r, "/b/"+board, http.StatusFound)
 }
@@ -75,7 +69,7 @@ func ListHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	boards, err := repo.List(hash)
-	check(err, w)
+	render.Check(err, w)
 
 	render.Render(w, r, "board_list", map[string]interface{}{
 		"request": r,
@@ -89,10 +83,10 @@ func BoardHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	board, err := repo.Load(hash)
-	check(err, w)
+	render.Check(err, w)
 
 	paths, err := pathRepo.List(board.Hash)
-	check(err, w)
+	render.Check(err, w)
 
 	render.Render(w, r, "board", map[string]interface{}{
 		"request": r,
@@ -107,7 +101,7 @@ func UndoPathHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	err := pathRepo.Delete(hash)
-	check(err, w)
+	render.Check(err, w)
 
 	http.Redirect(w, r, "/", 302) // FIXME: Should redirect to the board
 }
@@ -118,7 +112,7 @@ func ClearHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	err := repo.Clear(hash)
-	check(err, w)
+	render.Check(err, w)
 
 	http.Redirect(w, r, "/b/"+hash, 302) // FIXME: Should redirect to the board
 }

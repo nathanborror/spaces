@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/nathanborror/gommon/auth"
+	"github.com/nathanborror/gommon/crypto"
 	"github.com/nathanborror/gommon/render"
 	"github.com/nathanborror/spaces/dropbox"
 )
@@ -16,13 +17,6 @@ var repo = RoomSQLRepository("db.sqlite3")
 var roomMemberRepo = RoomMemberSQLRepository("db.sqlite3")
 var userRepo = auth.AuthSQLRepository("db.sqlite3")
 var cookieStore = sessions.NewCookieStore([]byte("something-very-very-secret"))
-
-func check(err error, w http.ResponseWriter) {
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
 
 // SaveHandler saves a item
 func SaveHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +29,7 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 	created := time.Now()
 
 	if hash == "" {
-		hash = GenerateRoomHash(name)
+		hash = crypto.UniqueHash(name)
 	}
 
 	room, err := repo.Load(hash)
@@ -45,16 +39,16 @@ func SaveHandler(w http.ResponseWriter, r *http.Request) {
 
 	room = &Room{Hash: hash, Name: name, Kind: kind, Folder: folder, Created: created}
 	err = repo.Save(room)
-	check(err, w)
+	render.Check(err, w)
 
 	// Add members to room
 	members := r.Form["members"]
-	members = append(members, u.Hash)
+	members = append(members, u.Key)
 	for _, user := range members {
-		hash = GenerateRoomMemberHash(room.Hash, user)
+		hash = crypto.Hash(room.Hash + user)
 		rm := &RoomMember{Hash: hash, User: user, Room: room.Hash}
 		err = roomMemberRepo.Save(rm)
-		check(err, w)
+		render.Check(err, w)
 	}
 
 	http.Redirect(w, r, "/r/"+room.Hash, http.StatusFound)
@@ -68,13 +62,13 @@ func EditHandler(w http.ResponseWriter, r *http.Request) {
 	u, _ := auth.GetAuthenticatedUser(r)
 
 	users, err := userRepo.List(100)
-	check(err, w)
+	render.Check(err, w)
 
 	room, err := repo.Load(hash)
-	check(err, w)
+	render.Check(err, w)
 
 	members, err := roomMemberRepo.ListMembers(room.Hash)
-	check(err, w)
+	render.Check(err, w)
 
 	render.Render(w, r, "room_form", map[string]interface{}{
 		"request": r,
@@ -90,7 +84,7 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 	u, _ := auth.GetAuthenticatedUser(r)
 
 	users, err := userRepo.List(100)
-	check(err, w)
+	render.Check(err, w)
 
 	render.Render(w, r, "room_form", map[string]interface{}{
 		"request": r,
@@ -106,11 +100,11 @@ func LeaveHandler(w http.ResponseWriter, r *http.Request) {
 
 	user, _ := auth.GetAuthenticatedUser(r)
 
-	membership, err := roomMemberRepo.Load(hash, user.Hash)
-	check(err, w)
+	membership, err := roomMemberRepo.Load(hash, user.Key)
+	render.Check(err, w)
 
 	err = roomMemberRepo.Delete(membership.Hash)
-	check(err, w)
+	render.Check(err, w)
 
 	http.Redirect(w, r, "/", 302)
 }
@@ -123,10 +117,10 @@ func JoinHandler(w http.ResponseWriter, r *http.Request) {
 	user, _ := auth.GetAuthenticatedUser(r)
 
 	room, err := repo.Load(hash)
-	check(err, w)
+	render.Check(err, w)
 
-	err = JoinRoom(room.Hash, user.Hash)
-	check(err, w)
+	err = JoinRoom(room.Hash, user.Key)
+	render.Check(err, w)
 
 	http.Redirect(w, r, "/r/"+room.Hash, 302)
 }
@@ -137,10 +131,10 @@ func MemberHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	room, err := repo.Load(hash)
-	check(err, w)
+	render.Check(err, w)
 
 	members, err := roomMemberRepo.ListMembers(room.Hash)
-	check(err, w)
+	render.Check(err, w)
 
 	render.Render(w, r, "room_members", map[string]interface{}{
 		"request": r,
@@ -151,13 +145,13 @@ func MemberHandler(w http.ResponseWriter, r *http.Request) {
 
 // ListHandler returns all available rooms
 func ListHandler(w http.ResponseWriter, r *http.Request) {
-	au, _ := auth.GetAuthenticatedUserHash(r)
+	au, _ := auth.GetAuthenticatedUserKey(r)
 
 	rooms, err := roomMemberRepo.ListRoomsForUser(au, 20)
-	check(err, w)
+	render.Check(err, w)
 
 	joinable, err := roomMemberRepo.ListJoinableRoomsForUser(au, 20)
-	check(err, w)
+	render.Check(err, w)
 
 	render.Render(w, r, "home", map[string]interface{}{
 		"request":  r,
@@ -172,7 +166,7 @@ func FolderHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	room, err := repo.Load(hash)
-	check(err, w)
+	render.Check(err, w)
 
 	var folder dropbox.Entry
 
@@ -185,7 +179,7 @@ func FolderHandler(w http.ResponseWriter, r *http.Request) {
 
 		url := fmt.Sprintf("https://api.dropbox.com/1/metadata/auto/%s", room.Folder)
 		response, err := dropbox.Request("GET", url, token)
-		check(err, w)
+		render.Check(err, w)
 
 		dropbox.DecodeResponse(response, &folder)
 	}

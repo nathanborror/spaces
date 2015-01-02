@@ -128,7 +128,7 @@ func (r *sqlRoomMemberRepository) List(hash string) ([]*RoomMember, error) {
 
 func (r *sqlRoomMemberRepository) ListMembers(hash string) ([]*auth.User, error) {
 	obj := []*auth.User{}
-	err := r.dbmap.Select(&obj, "SELECT * FROM user WHERE hash IN (SELECT user from roommember WHERE room = ?) ORDER BY created DESC", hash)
+	err := r.dbmap.Select(&obj, "SELECT * FROM user WHERE key IN (SELECT user from roommember WHERE room = ?) ORDER BY created DESC", hash)
 	return obj, err
 }
 

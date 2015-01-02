@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/gorilla/sessions"
 	"github.com/nathanborror/gommon/auth"
+	"github.com/nathanborror/gommon/crypto"
 	"github.com/nathanborror/gommon/markdown"
 	"github.com/nathanborror/gommon/render"
 	"github.com/nathanborror/gommon/spokes"
@@ -47,23 +48,16 @@ func init() {
 	}
 }
 
-func check(err error, w http.ResponseWriter) {
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-}
-
 // Rooms
 
 func roomHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	hash := vars["hash"]
 
-	userHash, _ := auth.GetAuthenticatedUserHash(r)
+	userHash, _ := auth.GetAuthenticatedUserKey(r)
 
 	room, err := roomRepo.Load(hash)
-	check(err, w)
+	render.Check(err, w)
 
 	// If this is a private one-on-one room check whether the logged
 	// in user is part of that room. If not, then they shouldn't be
@@ -77,10 +71,10 @@ func roomHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	messages, err := messageRepo.List(hash, 20)
-	check(err, w)
+	render.Check(err, w)
 
 	members, err := roomMemberRepo.ListMembers(room.Hash)
-	check(err, w)
+	render.Check(err, w)
 
 	isMember, _ := roomMemberRepo.Load(room.Hash, userHash)
 
@@ -100,20 +94,20 @@ func oneOnOneHandler(w http.ResponseWriter, r *http.Request) {
 	hash := vars["hash"]
 
 	user1, _ := auth.GetAuthenticatedUser(r)
-	user2, err := authRepo.Load(hash)
-	check(err, w)
+	user2, err := authRepo.Get(hash)
+	render.Check(err, w)
 
 	// Create a one-on-one room between the logged in user and the clicked on
 	// user if the room doesn't already exist.
-	room, err := roomRepo.LoadOneOnOne(user1.Hash, user2.Hash)
+	room, err := roomRepo.LoadOneOnOne(user1.Key, user2.Key)
 	if err != nil {
-		roomHash := rooms.GenerateOneOnOneHash(user1.Hash, user2.Hash)
+		roomHash := rooms.GenerateOneOnOneHash(user1.Key, user2.Key)
 		room = &rooms.Room{Hash: roomHash, Name: roomHash, Kind: rooms.OneOnOne, Folder: "", Created: time.Now()}
 		err = roomRepo.Save(room)
-		check(err, w)
+		render.Check(err, w)
 
-		rooms.JoinRoom(roomHash, user1.Hash)
-		rooms.JoinRoom(roomHash, user2.Hash)
+		rooms.JoinRoom(roomHash, user1.Key)
+		rooms.JoinRoom(roomHash, user2.Key)
 	}
 
 	render.Redirect(w, r, "/r/"+room.Hash)
@@ -121,7 +115,7 @@ func oneOnOneHandler(w http.ResponseWriter, r *http.Request) {
 
 func userListHandler(w http.ResponseWriter, r *http.Request) {
 	users, err := authRepo.List(100)
-	check(err, w)
+	render.Check(err, w)
 
 	render.Render(w, r, "user_list", map[string]interface{}{
 		"request": r,
@@ -130,13 +124,13 @@ func userListHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func roomsHandler(w http.ResponseWriter, r *http.Request) {
-	au, _ := auth.GetAuthenticatedUserHash(r)
+	au, _ := auth.GetAuthenticatedUserKey(r)
 
 	rs, err := roomMemberRepo.ListRoomsForUser(au, 20)
-	check(err, w)
+	render.Check(err, w)
 
 	joinable, err := roomMemberRepo.ListJoinableRoomsForUser(au, 20)
-	check(err, w)
+	render.Check(err, w)
 
 	render.Render(w, r, "home", map[string]interface{}{
 		"request":  r,
@@ -157,12 +151,12 @@ func messageSaveHandler(w http.ResponseWriter, r *http.Request) {
 	text := r.FormValue("text")
 
 	if hash == "" {
-		hash = messages.GenerateMessageHash(text)
+		hash = crypto.UniqueHash(text)
 	}
 
-	m := &messages.Message{Hash: hash, Room: room, User: au.Hash, Text: text}
+	m := &messages.Message{Hash: hash, Room: room, User: au.Key, Text: text}
 	err = messageRepo.Save(m)
-	check(err, w)
+	render.Check(err, w)
 
 	// Check for any resources in message
 	go dropbox.HandleDropboxFilesPut("DMX/Test.gdoc", text, r)
